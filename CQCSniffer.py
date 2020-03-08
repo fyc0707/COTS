@@ -205,12 +205,12 @@ class CQCSniffer:
             if 'TST' in row['Event Type']:
                 t = row['Event Type'].split(',').index('TST')
                 t = str(row['Event IP Cycle Time']).split(',')[t]
-                RWdataframe.loc[i] = [row['Complaint ID'], row['CQE'], row['Part Type Name'], row['Logical Customer Name'], 'TST', float(t), ' ', row['Business Line']]
+                ICEdataframe.loc[i] = [row['Complaint ID'], row['CQE'], row['Part Type Name'], row['Logical Customer Name'], 'TST', float(t), ' ', row['Business Line']]
                 i = i + 1
             elif 'ICE' in row['Event Type']:
                 t = row['Event Type'].split(',').index('ICE')
                 t = str(row['Event IP Cycle Time']).split(',')[t]
-                RWdataframe.loc[i] = [row['Complaint ID'], row['CQE'], row['Part Type Name'], row['Logical Customer Name'], 'ICE', float(t), ' ', row['Business Line']]
+                ICEdataframe.loc[i] = [row['Complaint ID'], row['CQE'], row['Part Type Name'], row['Logical Customer Name'], 'ICE', float(t), ' ', row['Business Line']]
                 i = i + 1
             else:
                 continue
