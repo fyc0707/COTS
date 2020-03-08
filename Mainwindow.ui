@@ -283,7 +283,7 @@
      <enum>Qt::ClickFocus</enum>
     </property>
     <property name="text">
-     <string>CQC Check-out   </string>
+     <string>CQC Check-Out   </string>
     </property>
     <property name="icon">
      <iconset resource="qt_resource.qrc">
@@ -419,7 +419,7 @@
      <enum>Qt::ClickFocus</enum>
     </property>
     <property name="text">
-     <string>JERBOA Queue</string>
+     <string>Jerboa Queue</string>
     </property>
     <property name="icon">
      <iconset resource="qt_resource.qrc">
@@ -437,5 +437,122 @@
  <resources>
   <include location="qt_resource.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>checkoutButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showWindow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>634</x>
+     <y>124</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>687</x>
+     <y>156</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>loginButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>loginCQC()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>378</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>50</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>receiptButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showWindow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>307</x>
+     <y>135</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>254</x>
+     <y>142</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lookupButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showWindow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>300</x>
+     <y>220</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>258</x>
+     <y>244</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>reportButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showWindow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>724</x>
+     <y>222</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>680</x>
+     <y>244</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>jerboaButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showWindow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>87</x>
+     <y>308</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>274</x>
+     <y>357</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>barcodeButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showWindow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>475</x>
+     <y>307</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>627</x>
+     <y>360</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>loginCQC()</slot>
+  <slot>showWindow()</slot>
+ </slots>
 </ui>

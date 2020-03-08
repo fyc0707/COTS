@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="Icon">
+    <file>resources/img/Receipt.png</file>
+  </qresource>
+</RCC>

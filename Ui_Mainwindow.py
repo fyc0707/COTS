@@ -178,6 +178,13 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
+        self.checkoutButton.clicked.connect(MainWindow.showWindow)
+        self.loginButton.clicked.connect(MainWindow.loginCQC)
+        self.receiptButton.clicked.connect(MainWindow.showWindow)
+        self.lookupButton.clicked.connect(MainWindow.showWindow)
+        self.reportButton.clicked.connect(MainWindow.showWindow)
+        self.jerboaButton.clicked.connect(MainWindow.showWindow)
+        self.barcodeButton.clicked.connect(MainWindow.showWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
