@@ -1,9 +1,9 @@
 import sys
+import CQCSniffer as cs
 from PyQt5.QtWidgets import QApplication, QMainWindow
-import Ui_Mainwindow, Receipt, Checkout, Barcode, Jerboa, Report, Lookup
+import Ui_Mainwindow, Receipt, Checkout, Barcode_w, Jerboa, Report, Lookup
 
-    
-    
+        
 class Mainwindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -13,7 +13,6 @@ class Mainwindow(QMainWindow):
     def showWindow(self):
         self.hide()
         sender = self.sender().text()
-        print(sender+'hh')
         if sender == 'CQC Receipt':
             self.myDialog = Receipt.Receipt()
         elif sender == 'CQC Check-out   ':
@@ -25,7 +24,7 @@ class Mainwindow(QMainWindow):
         elif sender == 'JERBOA Queue':
             self.myDialog = Jerboa.Jerboa()
         elif sender == 'Barcode Scanner':
-            self.myDialog = Barcode.Barcode()
+            self.myDialog = Barcode_w.Barcode()
         self.myDialog.exec_()
         self.show()
 

@@ -1,13 +1,12 @@
 import requests
 import pandas as pd
 import datetime
-import openpyxl as xl
 import teradata as td 
 from bs4 import BeautifulSoup
 from itertools import islice
 
 requests.urllib3.disable_warnings()
-pd.set_option('display.max_colwidth', -1)
+pd.set_option('display.max_colwidth', None)
 
 class CQCSniffer:
     headers = {
@@ -228,4 +227,3 @@ class CQCSniffer:
             if row.values[0]>last_comm_time:
                 last_comm_time = row.values[0]
         return last_comm_time
-    
