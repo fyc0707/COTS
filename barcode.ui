@@ -76,9 +76,12 @@
    <property name="text">
     <string/>
    </property>
+<<<<<<< HEAD
    <property name="maxLength">
     <number>7</number>
    </property>
+=======
+>>>>>>> 6a2820d0bf2c0e6e8b8469e764c2f87b12bb49a9
    <property name="alignment">
     <set>Qt::AlignCenter</set>
    </property>
@@ -100,9 +103,12 @@
      <bold>true</bold>
     </font>
    </property>
+<<<<<<< HEAD
    <property name="focusPolicy">
     <enum>Qt::NoFocus</enum>
    </property>
+=======
+>>>>>>> 6a2820d0bf2c0e6e8b8469e764c2f87b12bb49a9
    <property name="text">
     <string>Generate
 Barcode</string>

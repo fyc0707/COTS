@@ -268,7 +268,7 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(_translate("Dialog", "CQC Receipt"))
         self.pushButton.setText(_translate("Dialog", "Back to Menu"))
         self.getListButton.setText(_translate("Dialog", "Update CQC List"))
-        self.label_1.setText(_translate("Dialog", "CQC#"))
+        self.label_1.setText(_translate("Dialog", "CQC Number"))
         self.label_2.setText(_translate("Dialog", "Part Name"))
         self.label_3.setText(_translate("Dialog", "Quality Engineer"))
         self.label_4.setText(_translate("Dialog", "Product Engineer"))

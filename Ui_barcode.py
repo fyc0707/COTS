@@ -27,7 +27,11 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.backButton.setFont(font)
+<<<<<<< HEAD
         self.backButton.setFocusPolicy(QtCore.Qt.NoFocus)
+=======
+        self.backButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+>>>>>>> 6a2820d0bf2c0e6e8b8469e764c2f87b12bb49a9
         self.backButton.setObjectName("backButton")
         self.cqcnumInput = QtWidgets.QLineEdit(Dialog)
         self.cqcnumInput.setGeometry(QtCore.QRect(50, 280, 241, 81))
@@ -39,7 +43,10 @@ class Ui_Dialog(object):
         self.cqcnumInput.setFont(font)
         self.cqcnumInput.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.cqcnumInput.setText("")
+<<<<<<< HEAD
         self.cqcnumInput.setMaxLength(7)
+=======
+>>>>>>> 6a2820d0bf2c0e6e8b8469e764c2f87b12bb49a9
         self.cqcnumInput.setAlignment(QtCore.Qt.AlignCenter)
         self.cqcnumInput.setObjectName("cqcnumInput")
         self.barcodeGenButton = QtWidgets.QPushButton(Dialog)
@@ -50,7 +57,10 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.barcodeGenButton.setFont(font)
+<<<<<<< HEAD
         self.barcodeGenButton.setFocusPolicy(QtCore.Qt.NoFocus)
+=======
+>>>>>>> 6a2820d0bf2c0e6e8b8469e764c2f87b12bb49a9
         self.barcodeGenButton.setObjectName("barcodeGenButton")
         self.cqcnumOutput = QtWidgets.QLineEdit(Dialog)
         self.cqcnumOutput.setGeometry(QtCore.QRect(50, 90, 701, 141))

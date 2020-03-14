@@ -272,7 +272,7 @@
     <enum>Qt::NoFocus</enum>
    </property>
    <property name="text">
-    <string>CQC#</string>
+    <string>CQC Number</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
