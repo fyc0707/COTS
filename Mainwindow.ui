@@ -117,20 +117,20 @@
    <widget class="QLineEdit" name="userName">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>150</x>
       <y>20</y>
       <width>161</width>
       <height>31</height>
      </rect>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::ClickFocus</enum>
+     <enum>Qt::StrongFocus</enum>
     </property>
     <property name="acceptDrops">
      <bool>false</bool>
     </property>
     <property name="inputMask">
-     <string extracomment="Core ID"/>
+     <string/>
     </property>
     <property name="text">
      <string/>
@@ -142,10 +142,10 @@
    <widget class="QLabel" name="loginLabel">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>10</y>
+      <x>20</x>
+      <y>20</y>
       <width>121</width>
-      <height>91</height>
+      <height>71</height>
      </rect>
     </property>
     <property name="font">
@@ -156,8 +156,13 @@
       <bold>true</bold>
      </font>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;WBI Core ID:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Password:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>WBI ID:
+
+Password:</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -166,14 +171,14 @@
    <widget class="QLineEdit" name="password">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>150</x>
       <y>60</y>
       <width>161</width>
       <height>31</height>
      </rect>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::ClickFocus</enum>
+     <enum>Qt::StrongFocus</enum>
     </property>
     <property name="acceptDrops">
      <bool>false</bool>
@@ -184,9 +189,6 @@
     <property name="text">
      <string/>
     </property>
-    <property name="maxLength">
-     <number>9</number>
-    </property>
     <property name="echoMode">
      <enum>QLineEdit::Password</enum>
     </property>
@@ -194,7 +196,7 @@
    <widget class="QPushButton" name="loginButton">
     <property name="geometry">
      <rect>
-      <x>320</x>
+      <x>330</x>
       <y>20</y>
       <width>81</width>
       <height>71</height>
@@ -209,7 +211,10 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::ClickFocus</enum>
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="contextMenuPolicy">
+     <enum>Qt::DefaultContextMenu</enum>
     </property>
     <property name="text">
      <string>Login</string>
@@ -246,10 +251,10 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::ClickFocus</enum>
+     <enum>Qt::NoFocus</enum>
     </property>
     <property name="text">
-     <string>CQC Receipt</string>
+     <string>CQC Check-in</string>
     </property>
     <property name="icon">
      <iconset resource="qt_resource.qrc">
@@ -280,10 +285,10 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::ClickFocus</enum>
+     <enum>Qt::NoFocus</enum>
     </property>
     <property name="text">
-     <string>CQC Check-Out   </string>
+     <string>CQC Check-out   </string>
     </property>
     <property name="icon">
      <iconset resource="qt_resource.qrc">
@@ -314,7 +319,7 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::ClickFocus</enum>
+     <enum>Qt::NoFocus</enum>
     </property>
     <property name="text">
      <string>CQC WIP Report</string>
@@ -348,7 +353,7 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::ClickFocus</enum>
+     <enum>Qt::NoFocus</enum>
     </property>
     <property name="text">
      <string>CQC Lookup</string>
@@ -382,7 +387,7 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::ClickFocus</enum>
+     <enum>Qt::NoFocus</enum>
     </property>
     <property name="text">
      <string>Barcode Scanner</string>
@@ -416,7 +421,7 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::ClickFocus</enum>
+     <enum>Qt::NoFocus</enum>
     </property>
     <property name="text">
      <string>Jerboa Queue</string>

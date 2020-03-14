@@ -1,28 +1,23 @@
 import requests
 import pandas as pd
 import datetime
-import teradata as td 
 from bs4 import BeautifulSoup
-from itertools import islice
 
 requests.urllib3.disable_warnings()
 pd.set_option('display.max_colwidth', None)
 
 class CQCSniffer:
+    
     headers = {
-        'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
-        'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Language' : 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
-        'Accept-Encoding': 'gzip, deflate, br'
-    }
-    dataframe = pd.DataFrame()
+            'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
+            'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Language' : 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+            'Accept-Encoding': 'gzip, deflate, br'
+        }
 
-    def __init__(self, url, master_user, user_list=[], tz_offset=0):
-        self.url = url
-        self.user_list = user_list
-        self.tz_offset = datetime.timedelta(0, tz_offset*3600, 0)
+    def __init__(self, url, wbi, user_password):
         loginParam = {
-            'strCoreId' : master_user[0],
+            'strCoreId' : wbi,
             'strPage' : '',
             'strIncidentNo' : '',
             'strIncidentType' : '',
@@ -31,20 +26,58 @@ class CQCSniffer:
             'strAttchId' : '',
             'strCompId' : '',
             'strDuns' : '',
-            'strPassword' : master_user[1]
+            'strPassword' : user_password
         }
+        self.activeFlag = False
+        self.url = url
         self.session = requests.Session()
-        self.session.get(url, headers=self.headers, timeout=700, verify=False)
-        self.session.post(url+'login.do?method=login', data=loginParam, headers=self.headers, verify=False)
-        udaExec = td.UdaExec(appName='Report Drumbeat', version='alpha', logConsole=False)
-        self.tdsession = udaExec.connect(method='odbc', system='fsltdprd.am.freescale.net', 
-                                username='NXF44756', password='China#0303', authentication='LDAP')
-    
+        resp = self.session.post(url+'login.do?method=login', data=loginParam, headers=self.headers, verify=False).text
+        soup = BeautifulSoup(resp, 'html5lib')
+        name = soup.find('b', text='Logged in Userid:')
+        if name:
+            self.user_name = name.parent.parent.next_sibling.next_sibling.attrs['title']
+            self.activeFlag = True
+        else:
+            pass
+
+    def checkActive(self):
+        try:
+            resp = self.session.get(self.url+'login.do?method=homepage', verify=False, headers=self.headers, timeout=700).text
+            soup = BeautifulSoup(resp, 'html5lib')
+            name = soup.find('b', text='Logged in Userid:')
+            if name:
+                self.activeFlag = True
+                return True
+            else:
+                self.activeFlag = False
+                return False
+        except:
+            self.activeFlag = False
+            return False
+
+        soup = BeautifulSoup(resp, 'html5lib')
+        name = soup.find('b', text='Logged in Userid:')
+        if name:
+            self.activeFlag = True
+            return True
+        else:
+            self.activeFlag = False
+            return False
+
+
+    def tryUrl(self, turl):
+        f = True
+        while f:
+            try:
+                self.session.get(self.url + turl, verify = False, headers=self.headers, timeout=700)
+                s = False
+            except:
+                self.session.get(self.url+'login.do?method=homepage', verify=False, headers=self.headers, timeout=700)
+        
     def logOut(self):
         self.session.get(self.url+'login.do?method=logout')
-        self.tdsession.close()
     
-    def getDailyData(self, bookid):
+    def getRCVData(self, bookid):
         self.session.get(self.url+'advancedSearch.do?method=advancedSearchBookMarkResults&bookid='+bookid, headers=self.headers, verify=False, timeout=700)
         resp = self.session.get(self.url+'advancedSearch.do?method=advancedSearchResultsExcelExport', headers=self.headers, verify=False, timeout=700)
         with open('output.xlsx', 'wb') as output:
