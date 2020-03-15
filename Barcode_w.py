@@ -23,12 +23,7 @@ class Barcode(QDialog):
             bc = BytesIO()
             Code39(cqc_number, ImageWriter(), False).write(bc, dict(text_distance=1.0, module_height=9, font_size=12))
             img = QPixmap.fromImage(QImage.fromData(bc.getvalue()))
-<<<<<<< HEAD
             self.ui.barcodeDisplay.setPixmap(img.scaled(191, 81, 1))
-=======
-            self.ui.barcodeDisplay.setPixmap(img.scaled(241, 81, 1))            
-
->>>>>>> 6a2820d0bf2c0e6e8b8469e764c2f87b12bb49a9
         else:
             self.ui.cqcnumInput.setText('')
             self.em.showMessage('Please input a correct CQC Number')

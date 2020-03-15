@@ -1,10 +1,11 @@
-import requests
-import pandas as pd
+#coding=utf-8
 import datetime
+
+import pandas as pd
+import requests
 from bs4 import BeautifulSoup
 
 requests.urllib3.disable_warnings()
-pd.set_option('display.max_colwidth', None)
 
 class CQCSniffer:
     
@@ -73,24 +74,21 @@ class CQCSniffer:
                 s = False
             except:
                 self.session.get(self.url+'login.do?method=homepage', verify=False, headers=self.headers, timeout=700)
-        
+
+
     def logOut(self):
         self.session.get(self.url+'login.do?method=logout')
-    
-    def getRCVData(self, bookid):
-        self.session.get(self.url+'advancedSearch.do?method=advancedSearchBookMarkResults&bookid='+bookid, headers=self.headers, verify=False, timeout=700)
-        resp = self.session.get(self.url+'advancedSearch.do?method=advancedSearchResultsExcelExport', headers=self.headers, verify=False, timeout=700)
-        with open('output.xlsx', 'wb') as output:
-            output.write(resp.content)
-        wb = xl.load_workbook('output.xlsx')
-        ws = wb.active
-        ws.delete_rows(1,7)
-        data = ws.values
-        cols = next(data)[0:]
-        data = list(data)
-        data = (islice(r,0,None) for r in data)
-        self.dataframe = pd.DataFrame(data, columns=cols)
-        print(self.dataframe)
+
+
+    def getRCVData(self, fp):
+        df = pd.read_excel(fp, header=7)
+        df = df[df['Event Type'].str.contains('RCT|RCV')]
+        df = df.drop(['2nd UD field Reception', 'Event Type'], axis=1)
+        df.columns = ['CQC#','Type','CQE','Customer','Part Name','Trace Code','Instruction','B2B']
+        df['B2B'] = df['B2B'].apply(lambda x: False if pd.isna(x) else True)
+        df['Instruction'] = df['Instruction'].apply(lambda x: str(x)[19:])
+        df.reset_index(drop=True, inplace=True)
+        return df
 
     def getBookmark(self, bookid, filename):
         self.session.get(self.url+'advancedSearch.do?method=advancedSearchBookMarkResults&bookid='+bookid, headers=self.headers, verify=False, timeout=700)

@@ -1,10 +1,20 @@
-import sys, os
-import CQCSniffer
+#coding=utf-8
+import os
+import sys
 from datetime import datetime
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QErrorMessage
-import Ui_Mainwindow, Receipt, Checkout, Barcode_w, Jerboa, Report, Lookup
 
-        
+from PyQt5.QtWidgets import QApplication, QErrorMessage, QMainWindow, QMessageBox
+
+import Barcode_w
+import Checkout
+import CQCSniffer
+import Jerboa
+import Lookup
+import Receipt
+import Report
+import Ui_Mainwindow
+
+
 class Mainwindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -69,8 +79,9 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     w = Mainwindow()
     w.show()
-    try:
-        os.mkdir('log/'+datetime.today().date().isoformat())
-    except:
+    log = 'log/'+datetime.today().date().isoformat()
+    if os.path.exists(log):
         pass
+    else:
+        os.mkdir('log/'+datetime.today().date().isoformat())
     sys.exit(app.exec_())
