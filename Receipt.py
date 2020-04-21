@@ -1,5 +1,5 @@
 #coding=utf-8
-import os
+import os, subprocess, sys
 from datetime import datetime
 from io import BytesIO
 
@@ -8,9 +8,14 @@ from barcode import Code39
 from barcode.writer import ImageWriter
 from PyQt5.QtCore import QAbstractTableModel, Qt, QThread, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QDialog, QErrorMessage, QMessageBox
+from reportlab.pdfgen import canvas
+from reportlab.platypus import Paragraph, Image
+from reportlab.lib.units import cm
+from reportlab.lib.styles import ParagraphStyle as PS
 
 import CQCSniffer
 import Ui_receipt
+
 
 
 class Receipt(QDialog):
@@ -22,15 +27,18 @@ class Receipt(QDialog):
         self.em = QErrorMessage(self)
         self.em.setWindowTitle('Error')
         self.ui.welcomeLabel.setText('Welcome, '+self.cs.user_name)
-        self.list_file = 'log/'+datetime.today().date().isoformat()+'/rcvList.xlsx'
+        self.list_file = 'log/'+datetime.today().date().isoformat()+'/wipList.xlsx'
         self.checkFile()
         
-    
+    def fillInfo(self):
+        pass
+
     def itemSelected(self):
         row = self.ui.cqcList.selectedIndexes()[0].row()
         self.ui.cqcNumEdit.setText(self.rcv_df['CQC#'].loc[row])
         self.ui.partNameEdit.setText(self.rcv_df['Part Name'].loc[row])
         self.ui.cqeEdit.setText(self.rcv_df['CQE'].loc[row])
+        self.ui.qtyEdit.setText(self.rcv_df['Qty'].loc[row])
         #self.ui.peEdit.setText(self.rcv_df['PE'].loc[row])
         self.ui.instruEdit.setText(self.rcv_df['Instruction'].loc[row])
 
@@ -52,14 +60,47 @@ class Receipt(QDialog):
             os.remove(self.list_file+'1')
         elif signal == 102:
             self.release()
-            self.ui.resultLabel.setText('Download successfully')
-            os.replace(self.list_file+'1', self.list_file)
+            try:
+                os.replace(self.list_file+'1', self.list_file)
+                self.ui.resultLabel.setText('Download successfully')
+            except:
+                self.em.showMessage('The original file is being used by another process. Please close the file and retry.')
             self.checkFile()
         else:
             self.ui.progressBar.setValue(signal)
 
     def checkin(self):
-        pass
+        event = ''
+        cqc_type = ''
+        try:
+            event = 'RCT' if 'RCT' in self.rcv_df[self.rcv_df['CQC#']==self.ui.cqcNumEdit.text()]['Event'].iloc[0] else 'RCV'
+            cqc_type = self.rcv_df[self.rcv_df['CQC#']==self.ui.cqcNumEdit.text()]['Type'].iloc[0]
+        except:
+            event = ''
+            cqc_type = ''
+            self.ui.rcvBox.setChecked(False)
+            self.ui.prpBox.setChecked(False)
+        
+        mode = [self.ui.checkOnlyBox.isChecked(), self.ui.printBox.isChecked(), self.ui.prpBox.isChecked(), self.ui.rcvBox.isChecked()]
+        if mode == [False]*4:
+            self.em.showMessage('Please check options.')
+        else:           
+            event = ''
+            cqc_type = ''
+            try:
+                event = 'RCT' if 'RCT' in self.rcv_df[self.rcv_df['CQC#']==self.ui.cqeEdit.text()]['Event'].iloc[0] else 'RCV'
+                cqc_type = self.rcv_df[self.rcv_df['CQC#']==self.ui.cqcNumEdit.text()]['Type'].iloc[0]
+            except:
+                event = ''
+                cqc_type = ''
+            cqc_info = [self.ui.cqcNumEdit.text(), self.ui.partNameEdit.text(), self.ui.qtyEdit.text(), 
+                self.ui.cqeEdit.text(), self.ui.peEdit.text(), self.ui.instruEdit.text(), event, cqc_type]
+            
+            self.thread = checkinThread(self.cs, mode, cqc_info)
+            self.thread.progress_signal.connect(self.checkinCallBack)
+            self.thread.status_signal.connect(self.checkinCallBack)
+            self.thread.start()
+            self.busy()
     
     def checkinCallBack(self, signal):
         pass
@@ -68,16 +109,19 @@ class Receipt(QDialog):
     def checkFile(self):
         if os.path.exists(self.list_file):
             self.ui.cqcListLable.setText('Last Update:\n'+datetime.fromtimestamp(os.path.getmtime(self.list_file)).strftime('%Y-%m-%d %H:%M:%S'))
-            self.rcv_df = self.cs.getRCVData(self.list_file)
-            model = pandasModel(self.rcv_df.drop(['B2B'], axis=1))
+            self.wip_df = self.cs.getWIPData(self.list_file)
+            self.rcv_df = self.wip_df[self.wip_df['Event'].str.contains('RCT|RCV')]
+            self.rcv_df.reset_index(drop=True, inplace=True)
+            model = pandasModel(self.rcv_df.drop(['Event', 'B2B'], axis=1))
             self.ui.cqcList.setModel(model)
             self.ui.cqcList.setColumnWidth(0,55)
-            self.ui.cqcList.setColumnWidth(1,35)
+            self.ui.cqcList.setColumnWidth(1,30)
             self.ui.cqcList.setColumnWidth(2,90)
             self.ui.cqcList.setColumnWidth(3,85)
             self.ui.cqcList.setColumnWidth(4,85)
-            self.ui.cqcList.setColumnWidth(5,90)
-            self.ui.cqcList.setColumnWidth(6,190)
+            self.ui.cqcList.setColumnWidth(5,28)
+            self.ui.cqcList.setColumnWidth(6,90)
+            self.ui.cqcList.setColumnWidth(7,160)
 
         else:
             self.ui.cqcListLable.setText('No list found')
@@ -90,6 +134,7 @@ class Receipt(QDialog):
         self.ui.partNameEdit.clear()
         self.ui.cqeEdit.clear()
         self.ui.peEdit.clear()
+        self.ui.qtyEdit.clear()
         self.ui.instruEdit.clear()
         self.ui.rcvBox.setChecked(True)
         self.ui.prpBox.setChecked(True)
@@ -101,11 +146,12 @@ class Receipt(QDialog):
     def busy(self):
         self.ui.getListButton.setEnabled(False)
         self.ui.checkinButton.setEnabled(False)
+        self.ui.fillInfoButton.setEnabled(False)
 
     def release(self):
         self.ui.getListButton.setEnabled(True)
         self.ui.checkinButton.setEnabled(True)
-  
+        self.ui.fillInfoButton.setEnabled(True)
 
     @pyqtSlot()
     def on_rcvBox_clicked(self):
@@ -133,6 +179,8 @@ class Receipt(QDialog):
             event.accept()
         else:
             event.ignore()
+
+
 
 
 class pandasModel(QAbstractTableModel):
@@ -200,11 +248,77 @@ class downloadThread(QThread):
 class checkinThread(QThread):
     '''Checkin job chain thread
     '''
-    process_signal = pyqtSignal(int)
-    success_signal = pyqtSignal(str)
+    progress_signal = pyqtSignal(int)
+    status_signal = pyqtSignal(str)
 
-    def __init__(self, mode):
+    def __init__(self, cs, mode: list, cqc_info: list):
         super(checkinThread, self).__init__()
-    
+        self.cs = cs
+        self.mode = mode
+        self.cqc_info = cqc_info
+        
+
     def run(self):
-        pass
+        if cs.checkActive():
+            cqc_num, part_name, qty, cqe, pe, ins, event, cqc_type = self.cqc_info
+            progress = 0
+            taskqty = 1 + self.mode.count(False)
+            if self.mode[3]:
+                if event == 'RCT':
+                    pass
+                    #close RCT
+                else:
+                    pass
+                    #close RCV
+            
+            if self.mode[2]:
+                if self.cs.createAction(cqc_num, cqc_type, cqe):
+                    if self.cs.createEvent(cqc_num, cqe, cqe, 'PRP', 'Sample cleaning'):
+                        self.status_signal.emit('PRP created. ')
+                        self.progress_signal.emit(int((progress+1)*100/taskqty))
+                
+                
+
+            if self.mode[1]:
+                if self.printLabel(cqc_num, part_name, cqe, pe, ins):
+                    self.status_signal.emit('Label printed. ')
+                    self.progress_signal.emit(int((progress+1)*100/taskqty))
+            
+            
+            #record the handling
+            pass
+        else:
+            self.progress_signal.emit(101)
+            
+    
+    def printLabel(self, cqc_num, part_name, cqe, pe, ins):
+        try: 
+            style = PS('style', fontName="Helvetica-Bold", fontSize=8, leading=9, alignment=4)
+            story = canvas.Canvas('label.pdf', (6*cm, 4*cm))
+            story.setFont('Helvetica-Bold',9)
+            story.drawString(0.2*cm, 3.6*cm, 'Product:')
+            story.drawRightString(5.8*cm, 3.6*cm, part_name)
+            story.drawString(0.2*cm, 3.6*cm-11, 'CQE:')
+            story.drawRightString(5.8*cm, 3.6*cm-11, cqe)
+            story.drawString(0.2*cm, 3.6*cm-22, 'PE:')
+            story.drawRightString(5.8*cm, 3.6*cm-22, pe)
+            p = Paragraph('Instruction: '+ins, style)
+            x, y = p.wrap(5.6*cm, 18)
+            p.drawOn(story, 0.2*cm, 3.6*cm-23-y)
+            story.setFont('Helvetica-Bold',5)
+            story.drawCentredString(3*cm, 3.6*cm-51, '---------------------------------------------COTS---------------------------------------------')
+            Code39(cqc_num, ImageWriter(), False).save('bc', dict(text_distance=1.0, module_height=6, font_size=12, quiet_zone=1))
+            story.drawImage('bc.png', 0.2*cm, 0*cm, width=5.6*cm, height=1.8*cm, preserveAspectRatio=True)
+            os.remove('bc.png')
+            story.save()
+            args = 'gswin32c -dPrinted -dNOPAUSE -dBATCH -dNOSAFER -q -dNOPROMPT -dNumCopies=1 -dFitPage -sDEVICE=mswinpr2 ' \
+                '-dDEVICEWIDTHPOINTS=170 ' \
+                '-dDEVICEHEIGHTPOINTS=113 ' \
+                '-sOutputFile="%printer%Deli DL-886A" ' \
+                '"label.pdf"'
+            subprocess.call(args, shell=True)
+            os.remove('label.pdf')
+            return True
+        except:
+            False
+

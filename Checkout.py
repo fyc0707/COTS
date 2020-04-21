@@ -9,9 +9,4 @@ class Checkout(QDialog):
         self.ui.setupUi(self)
         self.cs = cs
     
-    def closeEvent(self, event):
-        result = QMessageBox.question(self, "Message", "Confirm to exit. The unsubmitted job will be lost.", QMessageBox.Yes | QMessageBox.No)
-        if(result == QMessageBox.Yes):
-            event.accept()
-        else:
-            event.ignore()
+    

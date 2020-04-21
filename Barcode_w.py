@@ -21,9 +21,9 @@ class Barcode(QDialog):
         cqc_number = self.ui.cqcnumInput.text()
         if re.match(r'^[0-9]{6}[A-Z]{1}$', cqc_number):
             bc = BytesIO()
-            Code39(cqc_number, ImageWriter(), False).write(bc, dict(text_distance=1.0, module_height=9, font_size=12))
+            Code39(cqc_number, ImageWriter(), False).write(bc, dict(text_distance=1.0, module_height=6, font_size=12, quiet_zone=1))
             img = QPixmap.fromImage(QImage.fromData(bc.getvalue()))
-            self.ui.barcodeDisplay.setPixmap(img.scaled(191, 81, 1))
+            self.ui.barcodeDisplay.setPixmap(img)
         else:
             self.ui.cqcnumInput.setText('')
             self.em.showMessage('Please input a correct CQC Number')

@@ -76,12 +76,9 @@
    <property name="text">
     <string/>
    </property>
-<<<<<<< HEAD
    <property name="maxLength">
     <number>7</number>
    </property>
-=======
->>>>>>> 6a2820d0bf2c0e6e8b8469e764c2f87b12bb49a9
    <property name="alignment">
     <set>Qt::AlignCenter</set>
    </property>
@@ -89,7 +86,7 @@
   <widget class="QPushButton" name="barcodeGenButton">
    <property name="geometry">
     <rect>
-     <x>340</x>
+     <x>310</x>
      <y>290</y>
      <width>161</width>
      <height>61</height>
@@ -103,12 +100,9 @@
      <bold>true</bold>
     </font>
    </property>
-<<<<<<< HEAD
    <property name="focusPolicy">
     <enum>Qt::NoFocus</enum>
    </property>
-=======
->>>>>>> 6a2820d0bf2c0e6e8b8469e764c2f87b12bb49a9
    <property name="text">
     <string>Generate
 Barcode</string>
@@ -119,7 +113,7 @@ Barcode</string>
     <rect>
      <x>50</x>
      <y>90</y>
-     <width>701</width>
+     <width>721</width>
      <height>141</height>
     </rect>
    </property>
@@ -168,27 +162,6 @@ Barcode</string>
     <string>Please input CQC number</string>
    </property>
   </widget>
-  <widget class="QLabel" name="barcodeLabel">
-   <property name="geometry">
-    <rect>
-     <x>550</x>
-     <y>250</y>
-     <width>191</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Calibri</family>
-     <pointsize>12</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Barcode for CQC</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
@@ -216,10 +189,10 @@ Barcode</string>
   <widget class="QLabel" name="barcodeDisplay">
    <property name="geometry">
     <rect>
-     <x>550</x>
-     <y>280</y>
-     <width>201</width>
-     <height>81</height>
+     <x>500</x>
+     <y>250</y>
+     <width>271</width>
+     <height>111</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -227,6 +200,12 @@ Barcode</string>
    </property>
    <property name="text">
     <string/>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
  </widget>

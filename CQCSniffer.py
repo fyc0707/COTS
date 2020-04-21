@@ -1,5 +1,5 @@
 #coding=utf-8
-import datetime
+import datetime, re
 
 import pandas as pd
 import requests
@@ -10,10 +10,12 @@ requests.urllib3.disable_warnings()
 class CQCSniffer:
     
     headers = {
-            'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
-            'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            'Accept-Language' : 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
-            'Accept-Encoding': 'gzip, deflate, br'
+            'Accept' : 'image/gif, image/jpeg, image/pjpeg, application/x-ms-application, application/xaml+xml, application/x-ms-xbap, */*',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept-Language': 'en-GB',
+            'User-Agent' : 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; Trident/4.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729; wbx 1.0.0)',
+            'Connection': 'Keep-Alive',
+            'Cache-Control': 'no-cache'
         }
 
     def __init__(self, url, wbi, user_password):
@@ -32,9 +34,13 @@ class CQCSniffer:
         self.activeFlag = False
         self.url = url
         self.session = requests.Session()
-        resp = self.session.post(url+'login.do?method=login', data=loginParam, headers=self.headers, verify=False).text
-        soup = BeautifulSoup(resp, 'html5lib')
-        name = soup.find('b', text='Logged in Userid:')
+        name = None
+        try:
+            resp = self.session.post(url+'login.do?method=login', data=loginParam, headers=self.headers, verify=False).text
+            soup = BeautifulSoup(resp, 'html5lib')
+            name = soup.find('b', text='Logged in Userid:')
+        except:
+            pass
         if name:
             self.user_name = name.parent.parent.next_sibling.next_sibling.attrs['title']
             self.activeFlag = True
@@ -70,191 +76,200 @@ class CQCSniffer:
         f = True
         while f:
             try:
-                self.session.get(self.url + turl, verify = False, headers=self.headers, timeout=700)
+                resp = self.session.get(self.url + turl, verify = False, headers=self.headers, timeout=700)
                 s = False
+                return resp
             except:
                 self.session.get(self.url+'login.do?method=homepage', verify=False, headers=self.headers, timeout=700)
+                return False
 
 
     def logOut(self):
         self.session.get(self.url+'login.do?method=logout')
 
 
-    def getRCVData(self, fp):
-        df = pd.read_excel(fp, header=7)
-        df = df[df['Event Type'].str.contains('RCT|RCV')]
-        df = df.drop(['2nd UD field Reception', 'Event Type'], axis=1)
-        df.columns = ['CQC#','Type','CQE','Customer','Part Name','Trace Code','Instruction','B2B']
+    def getWIPData(self, fp):
+        df = pd.read_excel(fp, header=7).astype(str)
+        #df = df[df['Event Type'].str.contains('RCT|RCV')]
+        df = df.drop(['2nd UD field Reception'], axis=1)
+        df.columns = ['CQC#','Type','CQE','Customer','Part Name','Qty', 'Trace Code','Instruction', 'Event', 'B2B']
         df['B2B'] = df['B2B'].apply(lambda x: False if pd.isna(x) else True)
         df['Instruction'] = df['Instruction'].apply(lambda x: str(x)[19:])
-        df.reset_index(drop=True, inplace=True)
+        #df.reset_index(drop=True, inplace=True)
         return df
 
     def getBookmark(self, bookid, filename):
-        self.session.get(self.url+'advancedSearch.do?method=advancedSearchBookMarkResults&bookid='+bookid, headers=self.headers, verify=False, timeout=700)
+        self.session.get(self.url+'advancedSearch.do?method=advancedSearchBookMarkResults,bookid='+bookid, headers=self.headers, verify=False, timeout=700)
         resp = self.session.get(self.url+'advancedSearch.do?method=advancedSearchResultsExcelExport', headers=self.headers, verify=False, timeout=700)
         with open(filename, 'wb') as output:
             output.write(resp.content)
     
-    def getReportDrumbeat(self, window_size=2):
-        df = self.dataframe[self.dataframe['Complaint Status'].isin(['IP','OP'])]
-        df = df[df['Business Line'].isin(['BLC1','BLC2','BLC3','BLC4','BLSP','BLAU'])]
-        df.reset_index(inplace=True)
-        RDdataframe = pd.DataFrame(columns=['CQC#','CQE','Customer','Flagged','Due Report','Due Time'])
-        due_time = []
-        for index, rows in df.iterrows():
-            init_time = rows['Complaint Start Date']
-            rcv_time = rows['Receive Date']
-            last_comm_time = None
-            last_comm = None
-            if rows['Customer Complaint ID'] != '':
-                last_comm_time = self.getB2BLastComm(rows['Complaint ID'])
+    
+    def closeRCV(self, cqc_num, cqc_type, cqe, qty):
+        pass
+
+    def createAction(self, cqc_num, cqc_type, cqe:str):
+        try:
+            cqe = cqe.split('(')[-1].split(')')[0]
+            self.tryUrl('login.do?method=loadProxy&rid='+cqe)
+            data = {
+                'arractid' : '',
+                'arrPreDef' : '',
+                'arrCustReq' : '',
+                'aiNumber' : 1,
+                'arrEvent' : '',
+                'arrEventType' : '',
+                'arrLineitem' : '',
+                'arrItem' : 'newActionItem',
+                'arrRcommitDate' : '',
+                'arrTitle' : '',
+                'arrDesc' : 'Sample cleaning',
+                'arrType' : 'Problem Verification',
+                'arrOwner' : cqe,
+                'arrExpEff' : '',
+                'arrInter1' : 'Y',
+                'arrCommitDate' : datetime.date.today().strftime('%d-%b-%Y'),
+                'arrSenddate' : '',
+                'arrStatus' : 'NEW',
+                'arrCustStatus' : '',
+                'arrEndDate' : '',
+                'arrValid' : '',
+                'arrResult' : '',
+                'arrMesEff' : ' ',
+                'arrValDate' : ''
+            }
+            self.tryUrl('actionPlan.do?method=actionItemInformation&strIncidentNo='+cqc_num+'&strIncidentType='+cqc_type)
+            self.session.post(self.url+'actionPlan.do?method=actionMultiActionitemInsert&IncNo='+cqc_num, data=data, headers=self.headers, verify=False)
+            resp = self.tryUrl('actionPlan.do?method=actionItemInformation&strIncidentNo='+cqc_num).text
+            soup = BeautifulSoup(resp, 'html5lib')
+            if soup.find('textarea', text='Sample cleaning'):
+                return True
             else:
-                last_comm_time = rows['Initial Send Date']
-                try:
-                    last_comm_time = datetime.datetime.strftime(last_comm_time, '%m-%d-%Y %H:%M')
-                except:
-                    pass
-                last_comm = rows['Communication Type']
-                if last_comm_time != '':
-                    receive = last_comm_time.split(',').count('Receive')
-                    comm_number = len(last_comm_time.split(','))
-                    last_comm_time = last_comm_time.split(',')[-1]
-                    last_comm_time = datetime.datetime.strptime(last_comm_time, '%m-%d-%Y %H:%M')
-                    last_comm = last_comm.split(',')[comm_number-1]
-                    if comm_number-receive == 0:
-                        last_comm = None
-                        last_comm_time = None
-                else:
-                    last_comm_time = None
-            RDdataframe.loc[index,'CQC#'] = rows['Complaint ID']
-            RDdataframe.loc[index,'CQE'] = rows['CQE']
-            RDdataframe.loc[index,'Customer'] = rows['Logical Customer Name']
-            RDdataframe.loc[index,'Flagged'] = rows['Customer Responsive Flag']
-        
-            
-            #B2B Communications
-            
-            if last_comm_time == None:
-                RDdataframe['Due Report'].loc[index] = 'FPC'
-                RDdataframe['Due Time'].loc[index] = init_time + datetime.timedelta(2,0,0) + self.tz_offset
-                due_time.append(init_time + datetime.timedelta(2,0,0))
-            elif rcv_time != None:
-                if last_comm_time == None:
-                        RDdataframe['Due Report'].loc[index] = 'Initial'
-                        RDdataframe['Due Time'].loc[index] = rcv_time + datetime.timedelta(2,0,0) + self.tz_offset
-                        due_time.append(rcv_time + datetime.timedelta(2,0,0))
-                else:
-                    if (last_comm_time + datetime.timedelta(5,0,0) > rcv_time) and (last_comm_time < rcv_time):
-                        RDdataframe['Due Report'].loc[index] = 'Initial'
-                        RDdataframe['Due Time'].loc[index] = rcv_time + datetime.timedelta(2,0,0) + self.tz_offset
-                        due_time.append(rcv_time + datetime.timedelta(2,0,0))
+                return False
+        except:
+            return False
+
+
+
+    def createEvent(self, cqc_num, cqc_type, cqe, owner, event, comment):
+        try:
+            cqe = cqe.split('(')[-1].split(')')[0]
+            owner = owner.split('(')[-1].split(')')[0]
+            self.tryUrl('login.do?method=loadProxy&rid='+cqe)
+            resp = self.tryUrl('getWorkFlowDetails.do?method=getEventsDetails&strIncidentNo='+cqc_num+'&strIncidentType='+cqc_type).text
+            soup = BeautifulSoup(resp, 'html5lib')
+            count = soup.find(id='lastIndexCount')['value']
+            data = dict()
+            for i in range(int(count)+1):
+                field = [
+                    'events['+str(i)+'].strEventNo',
+                    'events['+str(i)+'].strEventType',
+                    'events['+str(i)+'].strLineItem',
+                    'events['+str(i)+'].strParentEvent',
+                    'events['+str(i)+'].strParentName',
+                    'events['+str(i)+'].strAssignToLocation',
+                    'events['+str(i)+'].strRequestDate',
+                    'events['+str(i)+'].strStatus',
+                    'events['+str(i)+'].strAssignTo',
+                    'events['+str(i)+'].strAssignToName',
+                    'events['+str(i)+'].strDueDate',
+                    'events['+str(i)+'].strInstructions',
+                    'events['+str(i)+'].strStartDate',
+                    'events['+str(i)+'].strComments',
+                    'events['+str(i)+'].strCloseDate'
+                ]
+                for f in field:
+                    value = soup.find(attrs={'name':f})
+                    if value:
+                        if value.has_attr('value'):
+                            data[f] = value['value']
+                        else:
+                            data[f] = value.string
                     else:
-                        RDdataframe['Due Report'].loc[index] = 'Interim'
-                        RDdataframe['Due Time'].loc[index] = last_comm_time + datetime.timedelta(7,0,0) + self.tz_offset
-                        due_time.append(last_comm_time + datetime.timedelta(7,0,0))
-            else:
-                RDdataframe['Due Report'].loc[index] = 'Interim'
-                RDdataframe['Due Time'].loc[index] = last_comm_time + datetime.timedelta(7,0,0) + self.tz_offset
-                due_time.append(last_comm_time + datetime.timedelta(7,0,0))
+                        data[f] = ''
             
-        cqc_to_drop = []
-        current_time = datetime.datetime.now() - self.tz_offset
-        coverage = 2
-        if datetime.datetime.today().weekday() == 4:
-            coverage = 3
-
-        #Clean the dataframe
-        for i in range(len(RDdataframe)):
-            if due_time[i]==None:
-                cqc_to_drop.append(i)
-            elif due_time[i]-current_time > datetime.timedelta(coverage+0.01,0,0):
-                cqc_to_drop.append(i)
-        RDdataframe.drop(cqc_to_drop, inplace=True)
-        RDdataframe.sort_values(by='Due Time', inplace=True)
-        RDdataframe.reset_index(drop=True, inplace=True)
-        RDdataframe['Due Time'] = RDdataframe['Due Time'].apply(datetime.datetime.strftime, args=('%b-%d %I:%M %p',))
-        print(RDdataframe)
-        return(RDdataframe)
-
-    def getBacklogReport(self):
-        df = self.dataframe[self.dataframe['Business Line'].isin(['BLC1','BLC2','BLC3','BLC4','BLSP','BLAU'])]
-        df.reset_index(inplace=True)
-        drop_col = []
-        columns = df.columns.tolist()
-        for i in [0,7,8,9,10,11,13,16,18,19,22,23,24,25,28,29,30,31,32,36,37,38]:
-            drop_col.append(columns[i])
-        df.drop(columns=drop_col, inplace=True)
-        print(df)
-        return(df)
-    
-    def getCARReport(self):
-        df = self.dataframe[self.dataframe['Business Line'].isin(['BLC1','BLC2','BLC3','BLC4','BLSP','BLAU'])]
-        CARdataframe = pd.DataFrame(columns=['CQC#', 'CQE', 'Part Type', 'Date Code', 'Customer', 'CAR Owner', 'Event CT', 'Occur Code', 'Occur DESC.', 'FA Code', 'FA DESC.', 'Comments'])
-        i = 0
-        for index, row in df.iterrows():
-            if row['Corrective Action #'] == '':
-                continue
+            data['strPhase'] = soup.find('option', selected='selected')['value']
+            data['strCQINo'] = cqc_num
+            data['strIncidentType'] = cqc_type
+            if soup.find(id='addEventButton'):
+                resp = self.session.post(self.url+'getWorkFlowDetails.do?method=createEvent&strNewEventType='+event+
+                '&strNewParentEvent='+data['strPhase']+
+                '&strNewEventInstructions='+comment+
+                '&strNewEventAssignTo='+owner+
+                '&strNewEventDueDate=&strRCTNeeded=N&strNewLineItem=&strPAQConfirmation=', data=data, headers=self.headers, verify=False)
+                if 'Event created successfully.' in resp.text:
+                    return True
+                else:
+                    return False
             else:
-                t = row['Event Type'].split(',').index('CAR')
-                t = str(row['Event IP Cycle Time']).split(',')[t]
-                CARdataframe.loc[i] = [row['Complaint ID'], row['CQE'], row['Part Type Name'], row['Assembly Marked Date Code'], row['Logical Customer Name'], row['CAR Event Owner'], float(t), row['Fail Mech Occur Code'], row['Fail Mech Occur Desc'], row['Failure Code'], row['FAILURE CODE DESCRIPTION'], ' ']
-                i = i + 1
-        CARdataframe.sort_values('Event CT', ascending=False, inplace=True)
-        CARdataframe.reset_index(drop=True, inplace=True)
-        print(CARdataframe)
-        return CARdataframe
-    
-    def getRWReport(self):
-        df = self.dataframe[self.dataframe['Business Line'].isin(['BLC1','BLC2','BLC3','BLC4','BLSP','BLAU'])]
-        RWdataframe = pd.DataFrame(columns=['CQC#', 'CQE', 'Part Type', 'Customer', 'Event', 'Event CT', 'Comments'])
-        i = 0
-        for index, row in df.iterrows():
-            if 'PRW' in row['Event Type']:
-                t = row['Event Type'].split(',').index('PRW')
-                t = str(row['Event IP Cycle Time']).split(',')[t]
-                RWdataframe.loc[i] = [row['Complaint ID'], row['CQE'], row['Part Type Name'], row['Logical Customer Name'], 'PRW', float(t), ' ']
-                i = i + 1
-            elif 'CAW' in row['Event Type']:
-                t = row['Event Type'].split(',').index('CAW')
-                t = str(row['Event IP Cycle Time']).split(',')[t]
-                RWdataframe.loc[i] = [row['Complaint ID'], row['CQE'], row['Part Type Name'], row['Logical Customer Name'], 'CAW', float(t), ' ']
-                i = i + 1
-            else:
-                continue
-        RWdataframe.sort_values('Event CT', ascending=False, inplace=True)
-        RWdataframe.reset_index(drop=True, inplace=True)
-        print(RWdataframe)
-        return RWdataframe
+                return False
 
-    def getICETSTReport(self):
-        df = self.dataframe[self.dataframe['Business Line'].isin(['BLC1','BLC2','BLC3','BLC4','BLSP','BLAU'])]
-        ICEdataframe = pd.DataFrame(columns=['CQC#', 'CQE', 'Part Type', 'Customer', 'Event', 'Event CT', 'Comments', 'BL'])
-        i = 0
-        for index, row in df.iterrows():
-            if 'TST' in row['Event Type']:
-                t = row['Event Type'].split(',').index('TST')
-                t = str(row['Event IP Cycle Time']).split(',')[t]
-                ICEdataframe.loc[i] = [row['Complaint ID'], row['CQE'], row['Part Type Name'], row['Logical Customer Name'], 'TST', float(t), ' ', row['Business Line']]
-                i = i + 1
-            elif 'ICE' in row['Event Type']:
-                t = row['Event Type'].split(',').index('ICE')
-                t = str(row['Event IP Cycle Time']).split(',')[t]
-                ICEdataframe.loc[i] = [row['Complaint ID'], row['CQE'], row['Part Type Name'], row['Logical Customer Name'], 'ICE', float(t), ' ', row['Business Line']]
-                i = i + 1
+        except:
+            return False
+
+
+    def closeEvent(self, cqc_num, cqc_type, cqe, event, comment):
+        try:
+            cqe = cqe.split('(')[-1].split(')')[0]
+            self.tryUrl('login.do?method=loadProxy&rid='+cqe)
+            resp = self.tryUrl('getWorkFlowDetails.do?method=getEventsDetails&strIncidentNo='+cqc_num+'&strIncidentType='+cqc_type).text
+            soup = BeautifulSoup(resp, 'html5lib')
+            count = soup.find(id='lastIndexCount')['value']
+            data = dict()
+            for i in range(int(count)+1):
+                field = [
+                    'events['+str(i)+'].strEventNo',
+                    'events['+str(i)+'].strEventType',
+                    'events['+str(i)+'].strLineItem',
+                    'events['+str(i)+'].strParentEvent',
+                    'events['+str(i)+'].strParentName',
+                    'events['+str(i)+'].strAssignToLocation',
+                    'events['+str(i)+'].strRequestDate',
+                    'events['+str(i)+'].strStatus',
+                    'events['+str(i)+'].strAssignTo',
+                    'events['+str(i)+'].strAssignToName',
+                    'events['+str(i)+'].strDueDate',
+                    'events['+str(i)+'].strInstructions',
+                    'events['+str(i)+'].strStartDate',
+                    'events['+str(i)+'].strComments',
+                    'events['+str(i)+'].strCloseDate'
+                ]
+                for f in field:
+                    value = soup.find(attrs={'name':f})
+                    if value:
+                        if value.has_attr('value'):
+                            data[f] = value['value']
+                        else:
+                            data[f] = value.string
+                    else:
+                        data[f] = ''
+            
+            data['strPhase'] = soup.find('option', selected='selected')['value']
+            data['strCQINo'] = cqc_num
+            data['strIncidentType'] = cqc_type
+            index=''
+            eventcp=''
+            close_btn = soup.find_all(id='eventClose')
+            for i in close_btn:
+                index = i['onclick'].split("','")[-2]
+                eventcp = i['onclick'].split("','")[-1].split("')")[0]
+                if data['events['+index+'].strEventType'] == event:
+                    break
+                else:
+                    index=''
+                    eventcp=''
+            
+            if index:
+                data['events['+str(index)+'].strComments'] = comment
+                resp = self.session.post(self.url+'getWorkFlowDetails.do?method=closeEvent&index='+index+'&strEventCP='+eventcp, data=data, headers=self.headers, verify=False)
+                if 'Event closed successfully.' in resp.text:
+                    return True
+                else:
+                    return False
             else:
-                continue
+                return False
         
-        ICEdataframe.sort_values('Event CT', ascending=False, inplace=True)
-        ICEdataframe.reset_index(drop=True, inplace=True)
-        print(ICEdataframe)
-        return ICEdataframe
+        except:
+            return False
+    
 
-    def getB2BLastComm(self, cqc_number):
-        last_comm_time = None
-        for row in self.tdsession.execute('select SUBMIT_DATETIME from "EDW"."CQC_B2B_COMMUNICATION" where INCIDENT_NUM=\''+cqc_number+'\' and PROBLEM_SOLVER_SUMMARY_INDICATOR=\'S\';'):
-            if last_comm_time == None:
-                last_comm_time = row.values[0]
-            if row.values[0]>last_comm_time:
-                last_comm_time = row.values[0]
-        return last_comm_time

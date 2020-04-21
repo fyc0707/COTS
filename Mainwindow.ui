@@ -123,6 +123,11 @@
       <height>31</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
     <property name="focusPolicy">
      <enum>Qt::StrongFocus</enum>
     </property>
@@ -176,6 +181,11 @@ Password:</string>
       <width>161</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
     </property>
     <property name="focusPolicy">
      <enum>Qt::StrongFocus</enum>
@@ -270,8 +280,8 @@ Password:</string>
    <widget class="QPushButton" name="checkoutButton">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>110</y>
+      <x>20</x>
+      <y>190</y>
       <width>361</width>
       <height>71</height>
      </rect>
@@ -288,7 +298,7 @@ Password:</string>
      <enum>Qt::NoFocus</enum>
     </property>
     <property name="text">
-     <string>CQC Check-out   </string>
+     <string>CQC Check-out</string>
     </property>
     <property name="icon">
      <iconset resource="qt_resource.qrc">
@@ -344,8 +354,8 @@ Password:</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>190</y>
+      <x>410</x>
+      <y>110</y>
       <width>361</width>
       <height>71</height>
      </rect>
@@ -362,11 +372,11 @@ Password:</string>
      <enum>Qt::NoFocus</enum>
     </property>
     <property name="text">
-     <string>CQC Lookup</string>
+     <string> CQC Transfer    </string>
     </property>
     <property name="icon">
      <iconset resource="qt_resource.qrc">
-      <normaloff>:/icons/resources/img/Lookup.png</normaloff>:/icons/resources/img/Lookup.png</iconset>
+      <normaloff>:/icons/resources/img/alarm.png</normaloff>:/icons/resources/img/alarm.png</iconset>
     </property>
     <property name="iconSize">
      <size>

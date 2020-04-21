@@ -31,9 +31,9 @@ class Mainwindow(QMainWindow):
                 sender = self.sender().text()
                 if sender == 'CQC Check-in':
                     self.myDialog = Receipt.Receipt(self.cs)
-                elif sender == 'CQC Check-out   ':
+                elif sender == 'CQC Check-out':
                     self.myDialog = Checkout.Checkout(self.cs)
-                elif sender == 'CQC Lookup':
+                elif sender == ' CQC Transfer    ':
                     self.myDialog = Lookup.Lookup()
                 elif sender == 'CQC WIP Report':
                     self.myDialog = Report.Report()
@@ -68,6 +68,8 @@ class Mainwindow(QMainWindow):
     def closeEvent(self, event):
         result = QMessageBox.question(self, "Message", "Confirm to exit. Your account will be signed out.", QMessageBox.Yes | QMessageBox.No)
         if(result == QMessageBox.Yes):
+            if self.logged:
+                self.cs.logOut()
             event.accept()
         else:
             event.ignore()

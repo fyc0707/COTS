@@ -1,13 +1,13 @@
 <RCC>
   <qresource prefix="icons">
+    <file>resources/img/Checkout.png</file>
+    <file>resources/img/alarm.png</file>
     <file>resources/img/Barcode.png</file>
     <file>resources/img/Checkout.png</file>
     <file>resources/img/Jerboa.png</file>
-    <file>resources/img/Lookup.png</file>
     <file>resources/img/NXP.png</file>
     <file>resources/img/Receipt.png</file>
     <file>resources/img/Report.png</file>
     <file>resources/img/Scanner.png</file>
-    <file>resources/img/Truck.png</file>
   </qresource>
 </RCC>

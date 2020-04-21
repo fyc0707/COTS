@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>1020</width>
-    <height>500</height>
+    <height>550</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>1020</width>
-    <height>500</height>
+    <height>550</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>1020</width>
-    <height>500</height>
+    <height>600</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -140,7 +140,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>470</y>
+     <y>520</y>
      <width>311</width>
      <height>21</height>
     </rect>
@@ -215,7 +215,7 @@
      <x>320</x>
      <y>70</y>
      <width>16</width>
-     <height>421</height>
+     <height>471</height>
     </rect>
    </property>
    <property name="frameShadow">
@@ -323,7 +323,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>260</y>
+     <y>320</y>
      <width>111</width>
      <height>16</height>
     </rect>
@@ -350,7 +350,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>280</y>
+     <y>340</y>
      <width>161</width>
      <height>31</height>
     </rect>
@@ -377,7 +377,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>320</y>
+     <y>380</y>
      <width>111</width>
      <height>16</height>
     </rect>
@@ -404,7 +404,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>340</y>
+     <y>400</y>
      <width>161</width>
      <height>31</height>
     </rect>
@@ -431,7 +431,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>210</y>
+     <y>260</y>
      <width>121</width>
      <height>20</height>
     </rect>
@@ -458,7 +458,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>170</y>
+     <y>220</y>
      <width>121</width>
      <height>20</height>
     </rect>
@@ -485,7 +485,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>250</y>
+     <y>300</y>
      <width>121</width>
      <height>20</height>
     </rect>
@@ -512,7 +512,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>290</y>
+     <y>340</y>
      <width>121</width>
      <height>20</height>
     </rect>
@@ -536,9 +536,9 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>340</y>
-     <width>111</width>
-     <height>91</height>
+     <y>390</y>
+     <width>121</width>
+     <height>101</height>
     </rect>
    </property>
    <property name="font">
@@ -576,7 +576,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>440</y>
+     <y>490</y>
      <width>311</width>
      <height>21</height>
     </rect>
@@ -603,7 +603,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>400</y>
+     <y>460</y>
      <width>161</width>
      <height>31</height>
     </rect>
@@ -630,7 +630,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>380</y>
+     <y>440</y>
      <width>111</width>
      <height>16</height>
     </rect>
@@ -659,7 +659,7 @@
      <x>340</x>
      <y>80</y>
      <width>671</width>
-     <height>401</height>
+     <height>461</height>
     </rect>
    </property>
    <property name="font">
@@ -718,6 +718,96 @@ QHeaderView::section{
    <attribute name="verticalHeaderCascadingSectionResizes">
     <bool>false</bool>
    </attribute>
+  </widget>
+  <widget class="QPushButton" name="fillInfoButton">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>160</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>9</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="text">
+    <string>Fill CQC Info</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>40</width>
+     <height>40</height>
+    </size>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="qtyEdit">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>280</y>
+     <width>161</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>260</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>9</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string>Received Quantity</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
   </widget>
  </widget>
  <resources>
@@ -788,11 +878,28 @@ QHeaderView::section{
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>fillInfoButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>fillInfo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>256</x>
+     <y>171</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>314</x>
+     <y>154</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>backToMenu()</slot>
   <slot>itemSelected()</slot>
   <slot>getCqcList()</slot>
   <slot>checkin()</slot>
+  <slot>fillInfo()</slot>
  </slots>
 </ui>
