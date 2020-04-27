@@ -25,34 +25,41 @@ class Mainwindow(QMainWindow):
         self.logged = False
 
     def showWindow(self):
-        if self.logged:
-            if self.cs.checkActive():
-                self.hide()
-                sender = self.sender().text()
-                if sender == 'CQC Check-in':
-                    self.myDialog = Receipt.Receipt(self.cs)
-                elif sender == 'CQC Check-out':
-                    self.myDialog = Checkout.Checkout(self.cs)
-                elif sender == ' CQC Transfer    ':
-                    self.myDialog = Lookup.Lookup()
-                elif sender == 'CQC WIP Report':
-                    self.myDialog = Report.Report()
-                elif sender == 'JERBOA Queue':
-                    self.myDialog = Jerboa.Jerboa()
-                elif sender == 'Barcode Scanner':
-                    self.myDialog = Barcode_w.Barcode()
-                self.myDialog.exec_()
-                self.show()
+        sender = self.sender().text()
+        if sender == 'CQC Check-in' or sender == ' CQC Transfer    ':
+            if self.logged:
+                if self.cs.checkActive():
+                    self.hide()
+                    if sender == 'CQC Check-in':
+                        self.myDialog = Receipt.Receipt(self.cs)
+                    else:
+                        self.myDialog = Lookup.Lookup(self.cs)
+                    self.myDialog.exec_()
+                    self.show()
+                else:
+                    self.em.showMessage('Session expired. Please log in.')
+                    self.logged = False
+                    self.ui.userName.show()
+                    self.ui.password.show()
+                    self.ui.loginButton.show()
+                    self.ui.loginLabel.setText('WBI ID:\n\nPassword:')
             else:
-                self.em.showMessage('Session expired. Please log in.')
-                self.logged = False
-                self.ui.userName.show()
-                self.ui.password.show()
-                self.ui.loginButton.show()
-                self.ui.loginLabel.setText('WBI ID:\n\nPassword:')
+                self.em.showMessage('Please log in.')
         else:
-            self.em.showMessage('Please log in.')
-                
+            self.hide()
+            
+            if sender == 'CQC Check-out':
+                self.myDialog = Checkout.Checkout()
+            elif sender == 'CQC WIP Report':
+                self.myDialog = Report.Report()
+            elif sender == 'JERBOA Queue':
+                self.myDialog = Jerboa.Jerboa()
+            elif sender == 'Barcode Scanner':
+                self.myDialog = Barcode_w.Barcode()
+            self.myDialog.exec_()
+            self.show()
+
+                        
 
     def loginCQC(self):
         self.cs = CQCSniffer.CQCSniffer('https://nww.cqc.nxp.com/CQC/', self.ui.userName.text(), self.ui.password.text())

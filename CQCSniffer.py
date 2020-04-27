@@ -39,7 +39,8 @@ class CQCSniffer:
             resp = self.session.post(url+'login.do?method=login', data=loginParam, headers=self.headers, verify=False).text
             soup = BeautifulSoup(resp, 'html5lib')
             name = soup.find('b', text='Logged in Userid:')
-        except:
+        except Exception as err:
+            print(err)
             pass
         if name:
             self.user_name = name.parent.parent.next_sibling.next_sibling.attrs['title']
@@ -105,8 +106,130 @@ class CQCSniffer:
             output.write(resp.content)
     
     
-    def closeRCV(self, cqc_num, cqc_type, cqe, qty):
-        pass
+    def closeRCV(self, cqc_num, cqc_type, b2b, cqe, qty):
+        try:
+            self.tryUrl('login.do?method=loadProxy&rid='+'NXA08198')
+            resp = self.tryUrl('getSmrylnItm.do?method=getSummryLineItems&strIncidentNo='+cqc_num+'&strIncidentType='+cqc_type).text
+            soup = BeautifulSoup(resp, 'html5lib')
+            qty = qty.split(',')
+            if soup.find(id='lineitemrcv'):
+                count = soup.find(id='lastIndexCount')['value']
+                data = dict()
+                for i in range(int(count)):
+                    i = str(i)
+                    field = [
+                        'lineitemforms['+i+'].strfailNo',
+                        'lineitemforms['+i+'].strIncidentType',
+                        'lineitemforms['+i+'].strEditAccess',
+                        'lineitemforms['+i+'].strPhase',
+                        'lineitemforms['+i+'].strLineItemId',
+                        'lineitemforms['+i+'].strTNIAccess',
+                        'lineitemforms['+i+'].strLineItemDate',
+                        'lineitemforms['+i+'].strLineItemNo',
+                        'lineitemforms['+i+'].strIncidentNo',
+                        'lineitemforms['+i+'].strdelchk',
+                        'lineitemforms['+i+'].strrcvchk',
+                        'lineitemforms['+i+'].strLineItemType',
+                        'lineitemforms['+i+'].strCustReason',
+                        'lineitemforms['+i+'].strABADone',
+                        'lineitemforms['+i+'].strABAComments',
+                        'lineitemforms['+i+'].strFqeCustDesc',
+                        'lineitemforms['+i+'].strFqeComments',
+                        'lineitemforms['+i+'].strCqeCustDesc',
+                        'lineitemforms['+i+'].strCqeComments',
+                        'lineitemforms['+i+'].strCustRef',
+                        'lineitemforms['+i+'].strPrototype',
+                        'lineitemforms['+i+'].strMileage',
+                        'lineitemforms['+i+'].strEndCustCode',
+                        'lineitemforms['+i+'].strCustBuildLoc',
+                        'lineitemforms['+i+'].strECUManufacturingDate',
+                        'lineitemforms['+i+'].strTraceCode',
+                        'lineitemforms['+i+'].strSysCdeInit',
+                        'lineitemforms['+i+'].strSysCdeValDB',
+                        'lineitemforms['+i+'].strSysCdeDrpInit',
+                        'lineitemforms['+i+'].strSysCdeDrpDb',
+                        'lineitemforms['+i+'].strSysCdeTxtInit',
+                        'lineitemforms['+i+'].strSysCdeTxtDb',
+                        'lineitemforms['+i+'].strReturnCode',
+                        'lineitemforms['+i+'].strFirstNo',
+                        'lineitemforms['+i+'].strFirstYes',
+                        'lineitemforms['+i+'].strSecondNo',
+                        'lineitemforms['+i+'].strSecondYes',
+                        'lineitemforms['+i+'].strUserAct',
+                        'lineitemforms['+i+'].strRequestId',
+                        'lineitemforms['+i+'].strRequestStatus',
+                        'lineitemforms['+i+'].strSysCodeTxt',
+                        'lineitemforms['+i+'].strEmptyCol',
+                        'lineitemforms['+i+'].strSysCodeDisp',
+                        'lineitemforms['+i+'].strDateCode',
+                        'lineitemforms['+i+'].strTestMarkedDateCode',
+                        'lineitemforms['+i+'].strBackMark',
+                        'lineitemforms['+i+'].strMaskSet',
+                        'lineitemforms['+i+'].strLineItemQty',
+                        'lineitemforms['+i+'].strCustSerialNo',
+                        'lineitemforms['+i+'].strLineItemComm',
+                        'lineitemforms['+i+'].strFabSite',
+                        'lineitemforms['+i+'].strWaferLotNo',
+                        'lineitemforms['+i+'].strFabOutDate',
+                        'lineitemforms['+i+'].strProbeSite',
+                        'lineitemforms['+i+'].strProbeDate',
+                        'lineitemforms['+i+'].strAssySite',
+                        'lineitemforms['+i+'].strAssyLotNo',
+                        'lineitemforms['+i+'].strAssyOutDate',
+                        'lineitemforms['+i+'].strTestSite',
+                        'lineitemforms['+i+'].strTestLotNo',
+                        'lineitemforms['+i+'].strTestOutDate',
+                        'lineitemforms['+i+'].strQtyRcvd',
+                        'lineitemforms['+i+'].strFuncSafetyIssue',
+                        'lineitemforms['+i+'].strCustFunSafetyRelIssue'
+                    ]
+                    if b2b:
+                        field = field + [
+                            'lineitemforms['+i+'].strLineCompId',
+                            'lineitemforms['+i+'].strLineCompDuns',
+                            'lineitemforms['+i+'].strAssignBtnAccess',
+                            'lineitemforms['+i+'].strResetBtnAccess',
+                            'lineitemforms['+i+'].strLineCompStatus',
+                            'lineitemforms['+i+'].strLineCompDesc',
+                            'lineitemforms['+i+'].strRcvInfo'
+                        ]
+                    for f in field:
+                        value = soup.find(attrs={'name':f})
+                        if value:
+                            if value.has_attr('value'):
+                                data[f] = value['value']
+                            else:
+                                data[f] = value.string
+                        else:
+                            data[f] = ''
+                    data['lineitemforms['+i+'].strQtyRcvd'] = str(int(qty[int(i)]))
+                
+                data['CANumber'] = soup.find(attrs={'name':'CANumber'})['value']
+                data['strUserId'] = soup.find(attrs={'name':'strUserId'})['value']
+                data['strPassword'] = soup.find(attrs={'name':'strPassword'})['value']
+                data['strProxyId'] = soup.find(attrs={'name':'strProxyId'})['value']
+                data['strPartNum'] = ''
+                data['strSysCodeAvab'] = ''
+                data['strSysCodeExist'] = ''
+                data['strIncidentNo'] = soup.find(attrs={'name':'strIncidentNo'})['value']
+                data['strIncidentType'] = soup.find(attrs={'name':'strIncidentType'})['value']
+                data['strStatusCode'] = soup.find(attrs={'name':'strStatusCode'})['value']
+                data['strCheckAdmin'] = soup.find(attrs={'name':'strCheckAdmin'})['value']
+                data['strCheckFqe'] = soup.find(attrs={'name':'strCheckFqe'})['value']
+                data['strCheckCqe'] = soup.find(attrs={'name':'strCheckCqe'})['value']
+                data['strCheckReceptionCenter'] = soup.find(attrs={'name':'strCheckReceptionCenter'})['value']
+                self.session.post(self.url+'getSmrylnItm.do?method=receiveLineitem', data=data, headers=self.headers, verify=False)
+                resp = self.tryUrl('getSmrylnItm.do?method=getSummryLineItems&strIncidentType='+cqc_type+'&strIncidentNo='+cqc_num)
+                if '<input type="hidden" name="lineitemforms[0].strQtyRcvd"' in resp.text:
+                    return True
+                else:
+                    return False
+            else:
+                return False
+
+        except Exception as err:
+            print(err)
+            return False
 
     def createAction(self, cqc_num, cqc_type, cqe:str):
         try:
@@ -146,7 +269,8 @@ class CQCSniffer:
                 return True
             else:
                 return False
-        except:
+        except Exception as err:
+            print(err)
             return False
 
 
@@ -161,22 +285,23 @@ class CQCSniffer:
             count = soup.find(id='lastIndexCount')['value']
             data = dict()
             for i in range(int(count)+1):
+                i = str(i)
                 field = [
-                    'events['+str(i)+'].strEventNo',
-                    'events['+str(i)+'].strEventType',
-                    'events['+str(i)+'].strLineItem',
-                    'events['+str(i)+'].strParentEvent',
-                    'events['+str(i)+'].strParentName',
-                    'events['+str(i)+'].strAssignToLocation',
-                    'events['+str(i)+'].strRequestDate',
-                    'events['+str(i)+'].strStatus',
-                    'events['+str(i)+'].strAssignTo',
-                    'events['+str(i)+'].strAssignToName',
-                    'events['+str(i)+'].strDueDate',
-                    'events['+str(i)+'].strInstructions',
-                    'events['+str(i)+'].strStartDate',
-                    'events['+str(i)+'].strComments',
-                    'events['+str(i)+'].strCloseDate'
+                    'events['+i+'].strEventNo',
+                    'events['+i+'].strEventType',
+                    'events['+i+'].strLineItem',
+                    'events['+i+'].strParentEvent',
+                    'events['+i+'].strParentName',
+                    'events['+i+'].strAssignToLocation',
+                    'events['+i+'].strRequestDate',
+                    'events['+i+'].strStatus',
+                    'events['+i+'].strAssignTo',
+                    'events['+i+'].strAssignToName',
+                    'events['+i+'].strDueDate',
+                    'events['+i+'].strInstructions',
+                    'events['+i+'].strStartDate',
+                    'events['+i+'].strComments',
+                    'events['+i+'].strCloseDate'
                 ]
                 for f in field:
                     value = soup.find(attrs={'name':f})
@@ -197,14 +322,15 @@ class CQCSniffer:
                 '&strNewEventInstructions='+comment+
                 '&strNewEventAssignTo='+owner+
                 '&strNewEventDueDate=&strRCTNeeded=N&strNewLineItem=&strPAQConfirmation=', data=data, headers=self.headers, verify=False)
-                if 'Event created successfully.' in resp.text:
+                if 'Event created successfully.' in resp.text or comment in resp.text:
                     return True
                 else:
                     return False
             else:
                 return False
 
-        except:
+        except Exception as err:
+            print(err)
             return False
 
 
@@ -217,22 +343,23 @@ class CQCSniffer:
             count = soup.find(id='lastIndexCount')['value']
             data = dict()
             for i in range(int(count)+1):
+                i = str(i)
                 field = [
-                    'events['+str(i)+'].strEventNo',
-                    'events['+str(i)+'].strEventType',
-                    'events['+str(i)+'].strLineItem',
-                    'events['+str(i)+'].strParentEvent',
-                    'events['+str(i)+'].strParentName',
-                    'events['+str(i)+'].strAssignToLocation',
-                    'events['+str(i)+'].strRequestDate',
-                    'events['+str(i)+'].strStatus',
-                    'events['+str(i)+'].strAssignTo',
-                    'events['+str(i)+'].strAssignToName',
-                    'events['+str(i)+'].strDueDate',
-                    'events['+str(i)+'].strInstructions',
-                    'events['+str(i)+'].strStartDate',
-                    'events['+str(i)+'].strComments',
-                    'events['+str(i)+'].strCloseDate'
+                    'events['+i+'].strEventNo',
+                    'events['+i+'].strEventType',
+                    'events['+i+'].strLineItem',
+                    'events['+i+'].strParentEvent',
+                    'events['+i+'].strParentName',
+                    'events['+i+'].strAssignToLocation',
+                    'events['+i+'].strRequestDate',
+                    'events['+i+'].strStatus',
+                    'events['+i+'].strAssignTo',
+                    'events['+i+'].strAssignToName',
+                    'events['+i+'].strDueDate',
+                    'events['+i+'].strInstructions',
+                    'events['+i+'].strStartDate',
+                    'events['+i+'].strComments',
+                    'events['+i+'].strCloseDate'
                 ]
                 for f in field:
                     value = soup.find(attrs={'name':f})
@@ -262,14 +389,35 @@ class CQCSniffer:
             if index:
                 data['events['+str(index)+'].strComments'] = comment
                 resp = self.session.post(self.url+'getWorkFlowDetails.do?method=closeEvent&index='+index+'&strEventCP='+eventcp, data=data, headers=self.headers, verify=False)
-                if 'Event closed successfully.' in resp.text:
+                if 'Event closed successfully.' in resp.text or comment in resp.text :
                     return True
                 else:
                     return False
             else:
                 return False
         
-        except:
+        except Exception as err:
+            print(err)
             return False
     
+    def getProductName(self, cqc_num):
+        try:
+            resp = self.session.post(self.url+'advancedSearch.do?method=advancedSearchIncidents', data = {'incidentNo' : cqc_num}, headers=self.headers, verify=False).text
+            soup = BeautifulSoup(resp, 'html5lib')
+            name = soup.find(id='strLogicPartName')['value']
+            return str(name)
+            
+        except Exception as err:
+            print(err)
+            return None
 
+    def getCQEName(self, cqc_num):
+        try:
+            resp = self.session.post(self.url+'advancedSearch.do?method=advancedSearchIncidents', data = {'incidentNo' : cqc_num}, headers=self.headers, verify=False).text
+            soup = BeautifulSoup(resp, 'html5lib')
+            name = soup.find(attrs={'name':'strCQENameDesc'})['value']
+            return str(name)
+            
+        except Exception as err:
+            print(err)
+            return None
