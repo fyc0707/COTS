@@ -104,5 +104,5 @@ class Ui_Dialog(object):
         self.barcodeGenButton.setText(_translate("Dialog", "Generate\n"
 "Barcode"))
         self.inputLabel.setText(_translate("Dialog", "Please input CQC number"))
-        self.label.setText(_translate("Dialog", "Click the box below and scan the CQC barcode"))
+        self.label.setText(_translate("Dialog", "Click the box below and scan the CQC QR code"))
 import barcode_resource_rc

@@ -19,7 +19,7 @@
   <property name="maximumSize">
    <size>
     <width>1020</width>
-    <height>600</height>
+    <height>550</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -191,7 +191,7 @@
    <property name="font">
     <font>
      <family>Calibri</family>
-     <pointsize>11</pointsize>
+     <pointsize>10</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -201,9 +201,6 @@
    </property>
    <property name="text">
     <string/>
-   </property>
-   <property name="maxLength">
-    <number>7</number>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -810,6 +807,14 @@ QHeaderView::section{
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>cqcNumEdit</tabstop>
+  <tabstop>partNameEdit</tabstop>
+  <tabstop>qtyEdit</tabstop>
+  <tabstop>cqeEdit</tabstop>
+  <tabstop>peEdit</tabstop>
+  <tabstop>instruEdit</tabstop>
+ </tabstops>
  <resources>
   <include location="receipt_resource.qrc"/>
  </resources>

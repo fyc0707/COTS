@@ -23,6 +23,7 @@ class Mainwindow(QMainWindow):
         self.em = QErrorMessage(self)
         self.em.setWindowTitle('Error')
         self.logged = False
+        self.cs = CQCSniffer.CQCSniffer('https://nww.cqc.nxp.com/CQC/', '', '')
 
     def showWindow(self):
         sender = self.sender().text()
@@ -37,17 +38,33 @@ class Mainwindow(QMainWindow):
                     self.myDialog.exec_()
                     self.show()
                 else:
-                    self.em.showMessage('Session expired. Please log in.')
-                    self.logged = False
-                    self.ui.userName.show()
-                    self.ui.password.show()
-                    self.ui.loginButton.show()
-                    self.ui.loginLabel.setText('WBI ID:\n\nPassword:')
+                    result = QMessageBox.question(self, 'Message', 'The session connected to CQC system is expired. Continue with offline mode?', QMessageBox.Yes | QMessageBox.No)
+                    if result == QMessageBox.Yes:
+                        self.hide()
+                        if sender == 'CQC Check-in':
+                            self.myDialog = Receipt.Receipt(self.cs)
+                        else:
+                            self.myDialog = Lookup.Lookup(self.cs)
+                        self.myDialog.exec_()
+                        self.show()
+                    else:
+                        self.logged = False
+                        self.ui.userName.show()
+                        self.ui.password.show()
+                        self.ui.loginButton.show()
+                        self.ui.loginLabel.setText('WBI ID:\n\nPassword:')
             else:
-                self.em.showMessage('Please log in.')
+                result = QMessageBox.question(self, 'Message', 'Not logged on CQC system. Continue with offline mode?', QMessageBox.Yes | QMessageBox.No)
+                if result == QMessageBox.Yes:
+                    self.hide()
+                    if sender == 'CQC Check-in':
+                        self.myDialog = Receipt.Receipt(self.cs)
+                    else:
+                        self.myDialog = Lookup.Lookup(self.cs)
+                    self.myDialog.exec_()
+                    self.show()
         else:
             self.hide()
-            
             if sender == 'CQC Check-out':
                 self.myDialog = Checkout.Checkout()
             elif sender == 'CQC WIP Report':
@@ -63,6 +80,7 @@ class Mainwindow(QMainWindow):
 
     def loginCQC(self):
         self.cs = CQCSniffer.CQCSniffer('https://nww.cqc.nxp.com/CQC/', self.ui.userName.text(), self.ui.password.text())
+        self.cs.login()
         if self.cs.activeFlag:
             self.logged = True
             self.ui.userName.hide()

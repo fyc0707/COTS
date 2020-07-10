@@ -1,12 +1,6 @@
+from datetime import datetime
 
-
-#cs = CQCSniffer.CQCSniffer('https://nww.cqc.nxp.com/CQC/', 'nxf44756', 'China#0303')
-#print(cs.checkActive())
-#print(cs.closeRCV('527521A', 'CQPR', False, 'NXF44756','1'))
-
-
-
-
+print(datetime.today().date())
 '''
 field = [
                         'lineitemforms['+i+'].strfailNo',

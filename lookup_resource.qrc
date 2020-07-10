@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="newPrefix">
+    <file>resources/img/alarm.png</file>
     <file>resources/img/Lookup.png</file>
   </qresource>
 </RCC>

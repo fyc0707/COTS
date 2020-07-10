@@ -1,11 +1,15 @@
 #coding=utf-8
-import Ui_barcode, re
+import re
 from io import BytesIO
+
 from barcode import Code39
 from barcode.writer import ImageWriter
-from PyQt5.QtWidgets import QDialog, QErrorMessage
-from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtWidgets import QDialog, QErrorMessage
+
+import Ui_barcode
+
 
 class Barcode(QDialog):
     def __init__(self):
@@ -27,4 +31,3 @@ class Barcode(QDialog):
         else:
             self.ui.cqcnumInput.setText('')
             self.em.showMessage('Please input a correct CQC Number')
-

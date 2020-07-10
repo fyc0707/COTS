@@ -156,6 +156,7 @@ class Ui_MainWindow(object):
         self.lookupButton.setCheckable(False)
         self.lookupButton.setObjectName("lookupButton")
         self.barcodeButton = QtWidgets.QPushButton(self.centralwidget)
+        self.barcodeButton.setEnabled(False)
         self.barcodeButton.setGeometry(QtCore.QRect(410, 270, 361, 71))
         font = QtGui.QFont()
         font.setFamily("Calibri")
@@ -211,6 +212,6 @@ class Ui_MainWindow(object):
         self.checkoutButton.setText(_translate("MainWindow", "CQC Check-out"))
         self.reportButton.setText(_translate("MainWindow", "CQC WIP Report"))
         self.lookupButton.setText(_translate("MainWindow", " CQC Transfer    "))
-        self.barcodeButton.setText(_translate("MainWindow", "Barcode Scanner"))
+        self.barcodeButton.setText(_translate("MainWindow", "QR Code Scanner"))
         self.jerboaButton.setText(_translate("MainWindow", "Jerboa Queue"))
 import qt_resource_rc

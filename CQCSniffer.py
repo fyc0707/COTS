@@ -19,8 +19,16 @@ class CQCSniffer:
         }
 
     def __init__(self, url, wbi, user_password):
+        self.url = url
+        self.wbi = wbi
+        self.user_name = ''
+        self.user_password = user_password
+        self.activeFlag = False
+        self.session = requests.Session()
+
+    def login(self):
         loginParam = {
-            'strCoreId' : wbi,
+            'strCoreId' : self.wbi,
             'strPage' : '',
             'strIncidentNo' : '',
             'strIncidentType' : '',
@@ -29,11 +37,9 @@ class CQCSniffer:
             'strAttchId' : '',
             'strCompId' : '',
             'strDuns' : '',
-            'strPassword' : user_password
+            'strPassword' : self.user_password
         }
-        self.activeFlag = False
-        self.url = url
-        self.session = requests.Session()
+        
         name = None
         try:
             resp = self.session.post(url+'login.do?method=login', data=loginParam, headers=self.headers, verify=False).text
@@ -41,12 +47,13 @@ class CQCSniffer:
             name = soup.find('b', text='Logged in Userid:')
         except Exception as err:
             print(err)
-            pass
+            return False
         if name:
             self.user_name = name.parent.parent.next_sibling.next_sibling.attrs['title']
             self.activeFlag = True
+            return True
         else:
-            pass
+            return False
 
     def checkActive(self):
         try:
@@ -91,12 +98,14 @@ class CQCSniffer:
 
     def getWIPData(self, fp):
         df = pd.read_excel(fp, header=7).astype(str)
-        #df = df[df['Event Type'].str.contains('RCT|RCV')]
+        for i, row in df.iterrows():
+            if row['Part Type Name']=='nan':
+                row['Part Type Name'] = row['Part Type']
+        df = df.drop(['Part Type'], axis=1)
         df = df.drop(['2nd UD field Reception'], axis=1)
         df.columns = ['CQC#','Type','CQE','Customer','Part Name','Qty', 'Trace Code','Instruction', 'Event', 'B2B']
         df['B2B'] = df['B2B'].apply(lambda x: False if pd.isna(x) else True)
         df['Instruction'] = df['Instruction'].apply(lambda x: str(x)[19:])
-        #df.reset_index(drop=True, inplace=True)
         return df
 
     def getBookmark(self, bookid, filename):
@@ -313,7 +322,7 @@ class CQCSniffer:
                     else:
                         data[f] = ''
             
-            data['strPhase'] = soup.find('option', selected='selected')['value']
+            data['strPhase'] = 'EVAL'#soup.find('option', selected='selected')['value']
             data['strCQINo'] = cqc_num
             data['strIncidentType'] = cqc_type
             if soup.find(id='addEventButton'):
@@ -370,10 +379,10 @@ class CQCSniffer:
                             data[f] = value.string
                     else:
                         data[f] = ''
-            
             data['strPhase'] = soup.find('option', selected='selected')['value']
             data['strCQINo'] = cqc_num
             data['strIncidentType'] = cqc_type
+            print(data)
             index=''
             eventcp=''
             close_btn = soup.find_all(id='eventClose')
@@ -385,7 +394,6 @@ class CQCSniffer:
                 else:
                     index=''
                     eventcp=''
-            
             if index:
                 data['events['+str(index)+'].strComments'] = comment
                 resp = self.session.post(self.url+'getWorkFlowDetails.do?method=closeEvent&index='+index+'&strEventCP='+eventcp, data=data, headers=self.headers, verify=False)
@@ -421,3 +429,16 @@ class CQCSniffer:
         except Exception as err:
             print(err)
             return None
+
+    def getEmail(self, name):
+        try:
+            name = name.split('(')[-1].split(')')[0]
+            resp = self.session.get(self.url+'login.do?method=getOtherProfile&rid='+name, verify=False, headers=self.headers)
+            soup = BeautifulSoup(resp.text, 'html5lib')
+            email = soup.find('b', text='Department').parent.parent.previous_sibling.previous_sibling.a.next_element
+            return email
+
+        except Exception as err:
+            print(err)
+            return None
+        

@@ -389,6 +389,9 @@ Password:</string>
     </property>
    </widget>
    <widget class="QPushButton" name="barcodeButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>410</x>
@@ -409,7 +412,7 @@ Password:</string>
      <enum>Qt::NoFocus</enum>
     </property>
     <property name="text">
-     <string>Barcode Scanner</string>
+     <string>QR Code Scanner</string>
     </property>
     <property name="icon">
      <iconset resource="qt_resource.qrc">
