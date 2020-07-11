@@ -15,7 +15,6 @@ class Checkout(QDialog):
         self.ui.setupUi(self)
         self.em = QErrorMessage(self)
         self.em.setWindowTitle('Error')
-        self.ui.cqcNumEdit.setFocus()
         self.log_file = 'log/'+datetime.today().date().isoformat()+'/log.csv'
         self.checkFile()
         self.ui.destEdit.addItems(['PE', 'FA Lab', 'Ship out', 'Others'])

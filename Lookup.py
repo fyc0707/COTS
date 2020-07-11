@@ -1,12 +1,12 @@
 import os
 import re
-import pythoncom
 from datetime import datetime
 
 import pandas as pd
-from win32com.client import Dispatch
+import pythoncom
 from PyQt5.QtCore import QAbstractTableModel, Qt, QThread, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QCompleter, QDialog, QErrorMessage, QMessageBox
+from win32com.client import Dispatch
 
 import CQCSniffer
 import Ui_lookup
@@ -53,7 +53,6 @@ class Lookup(QDialog):
                 self.queue.drop_duplicates(['CQC#'], keep='last', ignore_index=True, inplace=True)
                 self.thread = transferThread(self.cs, mode, cqc_info)
                 self.thread.result_signal.connect(self.transferCallBack)
-                pythoncom.CoInitialize()
                 self.thread.start()
                 self.busy()
             else:
@@ -111,7 +110,15 @@ class Lookup(QDialog):
         self.busy()
     
     def emailCallBack(self, signal):
-        pass
+        if signal == '100':
+            self.ui.resultLabel.setText('Email sent successfully.')
+            pythoncom.CoUninitialize()
+            self.release()
+        else:
+            self.ui.resultLabel.setText('Email failed.')
+            pythoncom.CoUninitialize()
+            self.release()
+
 
     @pyqtSlot()
     def on_clearButton_clicked(self):
@@ -249,6 +256,7 @@ class emailThread(QThread):
         self.queue = queue
         self.cqeTable = cqeTable
         self.peTable = peTable
+        pythoncom.CoInitialize()
     def run(self):
         try:
             date = str(datetime.today().date())
@@ -281,8 +289,10 @@ class emailThread(QThread):
             mail.CC = ';'.join(cc_list)
             mail.HTMLBody = '<p>Dear Team,</p><p>Please collect your CQCs at the recepetion center.' + self.queue.to_html(escape=False) + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
             mail.Save()
+            self.result_signal.emit('100')
         except Exception as err:
             print(err)
+            self.result_signal.emit('101')
 
 
 

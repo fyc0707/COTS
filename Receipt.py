@@ -48,6 +48,8 @@ class Receipt(QDialog):
         if cqc_num in self.wip_df['CQC#'].values:
             self.ui.cqeEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['CQE'].iloc[0]))
             self.ui.partNameEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Part Name'].iloc[0]))
+            if self.ui.partNameEdit.text() in self.productTable['PART_TYPE_NAME'].values:
+                self.ui.peEdit.setText(self.productTable[self.productTable['PART_TYPE_NAME']==self.ui.partNameEdit.text()]['PE_NAME'].iloc[0])
             self.ui.qtyEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Qty'].iloc[0]))
             self.ui.instruEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Instruction'].iloc[0]))
         else:
@@ -90,7 +92,32 @@ class Receipt(QDialog):
         self.ui.cqeEdit.setText(self.rcv_df['CQE'].loc[row])
         self.ui.qtyEdit.setText(self.rcv_df['Qty'].loc[row])
         self.ui.instruEdit.setText(self.rcv_df['Instruction'].loc[row])
-
+    
+    @pyqtSlot()
+    def on_listenerButton_clicked(self):
+        self.data = self.ui.cqcNumEdit.text()
+        self.reset()
+        self.ui.resultLabel.setText('')
+        try:
+            if '（' in self.data or '）' in self.data:
+                self.em.showMessage('Please change the input language to English.')
+                self.data = None
+            else:
+                self.data = self.data.split('/\\')
+                if len(self.data)==10:
+                    cqc_num, qty, cqe, pe, pem, part_name, ins, rcv, prp, time = self.data
+                    self.ui.cqcNumEdit.setText(cqc_num)
+                    self.ui.partNameEdit.setText(part_name)
+                    self.ui.qtyEdit.setText(qty)
+                    self.ui.cqeEdit.setText(cqe)
+                    self.ui.peEdit.setText(pe)
+                    self.ui.instruEdit.setText(ins)
+                else:
+                    self.data = None
+                    self.em.showMessage('Unidentified QR code.')
+        except Exception as err:
+            self.data = None
+            print(err)
 
     def getCqcList(self):
         self.reset()

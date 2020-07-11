@@ -806,6 +806,51 @@ QHeaderView::section{
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
+  <widget class="QPushButton" name="listenerButton">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>170</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="text">
+    <string>PushButton</string>
+   </property>
+  </widget>
+  <zorder>listenerButton</zorder>
+  <zorder>pushButton</zorder>
+  <zorder>getListButton</zorder>
+  <zorder>line</zorder>
+  <zorder>welcomeLabel</zorder>
+  <zorder>progressBar</zorder>
+  <zorder>cqcListLable</zorder>
+  <zorder>cqcNumEdit</zorder>
+  <zorder>line_2</zorder>
+  <zorder>line_3</zorder>
+  <zorder>label_1</zorder>
+  <zorder>label_2</zorder>
+  <zorder>partNameEdit</zorder>
+  <zorder>label_3</zorder>
+  <zorder>cqeEdit</zorder>
+  <zorder>label_4</zorder>
+  <zorder>peEdit</zorder>
+  <zorder>prpBox</zorder>
+  <zorder>rcvBox</zorder>
+  <zorder>printBox</zorder>
+  <zorder>checkOnlyBox</zorder>
+  <zorder>checkinButton</zorder>
+  <zorder>resultLabel</zorder>
+  <zorder>instruEdit</zorder>
+  <zorder>label_5</zorder>
+  <zorder>cqcList</zorder>
+  <zorder>fillInfoButton</zorder>
+  <zorder>qtyEdit</zorder>
+  <zorder>label_6</zorder>
  </widget>
  <tabstops>
   <tabstop>cqcNumEdit</tabstop>

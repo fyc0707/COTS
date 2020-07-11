@@ -1,6 +1,6 @@
+import os
 from datetime import datetime
-
-print(datetime.today().date())
+print(os.path.abspath( 'log/'+datetime.today().date().isoformat()+'/log.csv'))
 '''
 field = [
                         'lineitemforms['+i+'].strfailNo',

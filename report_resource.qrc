@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="Icon">
+    <file>resources/img/open.png</file>
     <file>resources/img/Report.png</file>
+    <file>resources/img/refresh.png</file>
   </qresource>
 </RCC>
