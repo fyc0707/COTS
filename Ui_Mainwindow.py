@@ -57,6 +57,7 @@ class Ui_MainWindow(object):
         self.userName.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.userName.setAcceptDrops(False)
         self.userName.setInputMask("")
+        self.userName.setText("")
         self.userName.setMaxLength(9)
         self.userName.setObjectName("userName")
         self.loginLabel = QtWidgets.QLabel(self.centralwidget)
@@ -78,6 +79,7 @@ class Ui_MainWindow(object):
         self.password.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.password.setAcceptDrops(False)
         self.password.setInputMask("")
+        self.password.setText("")
         self.password.setEchoMode(QtWidgets.QLineEdit.Password)
         self.password.setObjectName("password")
         self.loginButton = QtWidgets.QPushButton(self.centralwidget)
@@ -202,11 +204,9 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "CQC Operation Tracking System - NXP Tianjin BL Quality"))
         self.about.setText(_translate("MainWindow", "<html><head/><body><p>COTS Version 0.1 Alpha</p><p>Developed by Tianjin BL Quality</p><p>Contact: van.fan@nxp.com</p></body></html>"))
         self.logo.setText(_translate("MainWindow", "<html><head/><body><p><img src=\":/icons/resources/img/NXP.png\"/></p></body></html>"))
-        self.userName.setText(_translate("MainWindow", "nxf44756"))
         self.loginLabel.setText(_translate("MainWindow", "WBI ID:\n"
 "\n"
 "Password:"))
-        self.password.setText(_translate("MainWindow", "China#0303"))
         self.loginButton.setText(_translate("MainWindow", "Login"))
         self.receiptButton.setText(_translate("MainWindow", "CQC Check-in"))
         self.checkoutButton.setText(_translate("MainWindow", "CQC Check-out"))
