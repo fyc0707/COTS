@@ -234,6 +234,11 @@ class Receipt(QDialog):
             if not os.path.exists(self.log_file):
                 df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Product','Instruction','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
                 df.to_csv(self.log_file, index_label=False)
+            else:
+                df = pd.read_csv(self.log_file)
+                if len(df) == 0:
+                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Product','Instruction','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
+                    df.to_csv(self.log_file, index_label=False, index=False)
         except:
             self.em.showMessage('The file is being used by another process. Please close the file and retry.')
         try:
@@ -471,7 +476,7 @@ class checkinThread(QThread):
             
             self.log.loc[len(self.log)] = [cqc_num, qty, cqe, pe, pem, part_name, ins, 
                                                 results[2], results[1], True, 
-                                                '', time.strftime('%Y-%m-%d %H:%M'), '','']
+                                                '', time.strftime('%d/%m/%Y %H:%M'), '','']
             self.log.to_csv(self.log_file, index_label=False, index=False)
             self.progress_signal.emit(102)
             if success:

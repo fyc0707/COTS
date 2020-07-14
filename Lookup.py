@@ -28,6 +28,7 @@ class Lookup(QDialog):
         self.list_file = 'log/'+datetime.today().date().isoformat()+'/wipList.xlsx'
         self.log_file = 'log/'+datetime.today().date().isoformat()+'/log.csv'
         self.data = None
+        pythoncom.CoInitialize()
         self.queue = pd.DataFrame(columns=['CQC#', 'CQE', 'PE', 'Product', 'TST', 'Instruction'])
         self.checkFile()
         
@@ -46,10 +47,11 @@ class Lookup(QDialog):
                     self.em.showMessage('Please input CQE and PE information')
                     return
                 product = self.ui.partNameEdit.text()
+                ins = self.ui.insEdit.text()
                 tst_flag = False
                 cqc_info = [cqc_num, cqe, pe, product]
                 mode = [self.ui.prpBox.isChecked(), self.ui.tstBox.isChecked()]
-                self.queue.loc[len(self.queue)] = [cqc_num, cqe, pe, product, False]
+                self.queue.loc[len(self.queue)] = [cqc_num, cqe, pe, product, False, ins]
                 self.queue.drop_duplicates(['CQC#'], keep='last', ignore_index=True, inplace=True)
                 self.thread = transferThread(self.cs, mode, cqc_info)
                 self.thread.result_signal.connect(self.transferCallBack)
@@ -256,6 +258,7 @@ class emailThread(QThread):
         self.queue = queue
         self.cqeTable = cqeTable
         self.peTable = peTable
+        self.cs = cs
         pythoncom.CoInitialize()
     def run(self):
         try:
@@ -287,7 +290,7 @@ class emailThread(QThread):
                         cc_list.append(email)
             mail.To = ';'.join(to_list)
             mail.CC = ';'.join(cc_list)
-            mail.HTMLBody = '<p>Dear Team,</p><p>Please collect your CQCs at the recepetion center.' + self.queue.to_html(escape=False) + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
+            mail.HTMLBody = '<p>Dear Team,</p><p>Please collect your CQCs at the reception center.' + self.queue.to_html(escape=False, na_rep='N/A', border=1) + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
             mail.Save()
             self.result_signal.emit('100')
         except Exception as err:

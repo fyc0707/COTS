@@ -404,7 +404,7 @@
    </property>
    <property name="styleSheet">
     <string notr="true">QTableView{
-	selection-background-color: rgb(201, 210, 0);
+	selection-background-color: rgb(123, 177, 219);
 }
 QHeaderView::section{
 	font: 75 8pt &quot;Arial&quot;;

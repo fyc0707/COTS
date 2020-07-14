@@ -39,7 +39,7 @@ class Ui_Dialog(object):
         self.cqcList.setFont(font)
         self.cqcList.setFocusPolicy(QtCore.Qt.NoFocus)
         self.cqcList.setStyleSheet("QTableView{\n"
-"    selection-background-color: rgb(201, 210, 0);\n"
+"    selection-background-color: rgb(249, 181, 0);\n"
 "}\n"
 "QHeaderView::section{\n"
 "    font: 75 8pt \"Calibri\";\n"

@@ -18,6 +18,7 @@ class Checkout(QDialog):
         self.log_file = 'log/'+datetime.today().date().isoformat()+'/log.csv'
         self.checkFile()
         self.ui.destEdit.addItems(['PE', 'FA Lab', 'Ship out', 'Others'])
+        self.ui.cqcNumEdit.setFocus()
         self.data = None
         
 
@@ -60,7 +61,7 @@ class Checkout(QDialog):
                                 elif col == 'Checkout':
                                     x = True
                                 elif col == 'Checkout Time':
-                                    x = checkout_time.strftime('%Y-%m-%d %H:%M')
+                                    x = checkout_time.strftime('%d/%m/%Y %H:%M')
                                 elif col == 'Destination':
                                     x = dest
                                 
@@ -68,12 +69,13 @@ class Checkout(QDialog):
                         print(row)
                         self.df.iloc[index] = row
                     else:
-                        self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, '', part_name, '', '', '', '', True, '', checkout_time.strftime('%Y-%m-%d %H:%M'), dest]
+                        self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, '', part_name, '', '', '', '', True, '', checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
                 else:
-                    self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, '', part_name, '', '', '', '', True, '', checkout_time.strftime('%Y-%m-%d %H:%M'), dest]
+                    self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, '', part_name, '', '', '', '', True, '', checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
             else:
                 cqc_num, qty, cqe, pe, pem, part_name, ins, rcv, prp, time = self.data
-                time = datetime.fromtimestamp(float(time)).strftime('%Y-%m-%d %H:%M')
+                time = datetime.fromtimestamp(float(time)).strftime('%d/%m/%Y %H:%M')
+                dest = self.ui.destEdit.currentText()
                 row = []
                 self.data = None
                 if cqc_num in self.df['CQC#'].values:
@@ -106,7 +108,7 @@ class Checkout(QDialog):
                                 elif col == 'Checkin Time':
                                     x = time
                                 elif col == 'Checkout Time':
-                                    x = checkout_time.strftime('%Y-%m-%d %H:%M')
+                                    x = checkout_time.strftime('%d/%m/%Y %H:%M')
                                 elif col == 'Destination':
                                     x = dest
                                 
@@ -114,9 +116,9 @@ class Checkout(QDialog):
                         
                         self.df.iloc[index] = row
                     else:
-                        self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, part_name, ins, rcv, prp, True, True, time, checkout_time.strftime('%Y-%m-%d %H:%M'), dest]
+                        self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, part_name, ins, rcv, prp, True, True, time, checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
                 else:
-                    self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, part_name, ins, rcv, prp, True, True, time, checkout_time.strftime('%Y-%m-%d %H:%M'), dest]
+                    self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, part_name, ins, rcv, prp, True, True, time, checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
 
 
             self.df.to_csv(self.log_file, index_label=False, index=False)
@@ -161,6 +163,12 @@ class Checkout(QDialog):
             if not os.path.exists(self.log_file):
                 df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Product','Instruction','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
                 df.to_csv(self.log_file, index_label=False, index=False)
+            else:
+                df = pd.read_csv(self.log_file)
+                if len(df) == 0:
+                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Product','Instruction','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
+                    df.to_csv(self.log_file, index_label=False, index=False)
+            
             self.df = pd.read_csv(self.log_file)
         except Exception as err:
             print(err)

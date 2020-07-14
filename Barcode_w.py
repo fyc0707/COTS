@@ -2,8 +2,7 @@
 import re
 from io import BytesIO
 
-from barcode import Code39
-from barcode.writer import ImageWriter
+
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QDialog, QErrorMessage
@@ -20,7 +19,7 @@ class Barcode(QDialog):
         self.em.setWindowTitle('Error')
         
     
-    @pyqtSlot()
+    '''@pyqtSlot()
     def on_barcodeGenButton_clicked(self):
         cqc_number = self.ui.cqcnumInput.text()
         if re.match(r'^[0-9]{6}[A-Z]{1}$', cqc_number):
@@ -30,4 +29,4 @@ class Barcode(QDialog):
             self.ui.barcodeDisplay.setPixmap(img)
         else:
             self.ui.cqcnumInput.setText('')
-            self.em.showMessage('Please input a correct CQC Number')
+            self.em.showMessage('Please input a correct CQC Number')'''

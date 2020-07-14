@@ -22,7 +22,9 @@ class Report(QDialog):
         self.ui.welcomeLabel.setText('Welcome, ' + self.cs.user_name)
         self.list_file = 'log/'+datetime.today().date().isoformat()+'/wipList.xlsx'
         self.log_file = 'log/'+datetime.today().date().isoformat()+'/log.csv'
+        pythoncom.CoInitialize()
         self.checkFile()
+        
 
     def openWith(self):
         try:
@@ -34,11 +36,14 @@ class Report(QDialog):
     def checkFile(self):
         try:
             if os.path.exists(self.log_file):
-                self.df = pd.read_csv(self.log_file).astype(str)
+                df = pd.read_csv(self.log_file)
+                if len(df) == 0:
+                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Product','Instruction','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
+                    df.to_csv(self.log_file, index_label=False, index=False)
             else:
                 df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Product','Instruction','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
                 df.to_csv(self.log_file, index_label=False, index=False)
-                self.df = df
+            self.df = pd.read_csv(self.log_file)
             self.updateTable()
             
         except Exception as err:
@@ -120,6 +125,7 @@ class emailThread(QThread):
         self.df = df
         self.cqeTable = cqeTable
         self.peTable = peTable
+        self.cs = cs
         pythoncom.CoInitialize()
     def run(self):
         try:
@@ -151,7 +157,7 @@ class emailThread(QThread):
                         to_list.append(email)
             mail.To = ';'.join(to_list)
             mail.CC = ';'.join(cc_list)
-            mail.HTMLBody = '<p>Dear Team,</p><p>Please refer to the CQCs that were received at the reception center today. Please arrange resouces for sample preparation and verification.' + self.df.to_html(escape=False) + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
+            mail.HTMLBody = '<p>Dear Team,</p><p>Please refer to the CQCs that were received at the reception center today. For the un-checkout CQCs, please arrange resources for sample preparation and verification according to the instruction.' + self.df.to_html(escape=False, na_rep='N/A', border=1) + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
             mail.Save()
             self.result_signal.emit('100')
         except Exception as err:

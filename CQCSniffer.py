@@ -42,7 +42,7 @@ class CQCSniffer:
         
         name = None
         try:
-            resp = self.session.post(url+'login.do?method=login', data=loginParam, headers=self.headers, verify=False).text
+            resp = self.session.post(self.url+'login.do?method=login', data=loginParam, headers=self.headers, verify=False).text
             soup = BeautifulSoup(resp, 'html5lib')
             name = soup.find('b', text='Logged in Userid:')
         except Exception as err:
@@ -382,7 +382,6 @@ class CQCSniffer:
             data['strPhase'] = soup.find('option', selected='selected')['value']
             data['strCQINo'] = cqc_num
             data['strIncidentType'] = cqc_type
-            print(data)
             index=''
             eventcp=''
             close_btn = soup.find_all(id='eventClose')
@@ -423,7 +422,10 @@ class CQCSniffer:
         try:
             resp = self.session.post(self.url+'advancedSearch.do?method=advancedSearchIncidents', data = {'incidentNo' : cqc_num}, headers=self.headers, verify=False).text
             soup = BeautifulSoup(resp, 'html5lib')
-            name = soup.find(attrs={'name':'strCQENameDesc'})['value']
+            name = str(soup.find(attrs={'name':'strCQENameDesc'})['value'])
+            wbi = name.split('(')[-1].split(')')[0]
+            name = name.split('(')[-2]
+            name = name+' ('+wbi+')'
             return str(name)
             
         except Exception as err:

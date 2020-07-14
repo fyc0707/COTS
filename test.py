@@ -1,6 +1,12 @@
 import os
 from datetime import datetime
-print(os.path.abspath( 'log/'+datetime.today().date().isoformat()+'/log.csv'))
+import pandas as pd 
+
+log = 'log/'+datetime.today().date().isoformat()+'/log.csv'
+
+print(datetime.now().strftime('%d/%m/%Y %H:%M'))
+
+
 '''
 field = [
                         'lineitemforms['+i+'].strfailNo',
