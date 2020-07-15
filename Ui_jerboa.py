@@ -23,7 +23,7 @@ class Ui_Dialog(object):
         self.pushButton.setGeometry(QtCore.QRect(860, 10, 151, 51))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(10)
+        font.setPixelSize(15)
         font.setBold(True)
         font.setWeight(75)
         self.pushButton.setFont(font)

@@ -23,7 +23,7 @@ class Ui_Dialog(object):
         self.pushButton.setGeometry(QtCore.QRect(950, 10, 151, 51))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(10)
+        font.setPixelSize(15)
         font.setBold(True)
         font.setWeight(75)
         self.pushButton.setFont(font)
@@ -33,7 +33,7 @@ class Ui_Dialog(object):
         self.cqcList.setGeometry(QtCore.QRect(20, 80, 1081, 461))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(8)
+        font.setPixelSize(13)
         font.setBold(False)
         font.setWeight(50)
         self.cqcList.setFont(font)
@@ -42,7 +42,7 @@ class Ui_Dialog(object):
 "    selection-background-color: rgb(249, 181, 0);\n"
 "}\n"
 "QHeaderView::section{\n"
-"    font: 75 8pt \"Calibri\";\n"
+"    font: 75 11px \"Calibri\";\n"
 "    background-color: rgb(232, 232, 232);\n"
 "}")
         self.cqcList.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
@@ -62,7 +62,7 @@ class Ui_Dialog(object):
         self.welcomeLabel.setGeometry(QtCore.QRect(20, 20, 291, 31))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(11)
+        font.setPixelSize(13)
         font.setBold(True)
         font.setWeight(75)
         self.welcomeLabel.setFont(font)
@@ -74,7 +74,7 @@ class Ui_Dialog(object):
         self.emailButton.setGeometry(QtCore.QRect(980, 560, 121, 51))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(9)
+        font.setPixelSize(14)
         font.setBold(True)
         font.setWeight(75)
         self.emailButton.setFont(font)
@@ -90,7 +90,7 @@ class Ui_Dialog(object):
         self.refreshButton.setGeometry(QtCore.QRect(20, 560, 121, 51))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(9)
+        font.setPixelSize(14)
         font.setBold(True)
         font.setWeight(75)
         self.refreshButton.setFont(font)
@@ -106,7 +106,7 @@ class Ui_Dialog(object):
         self.openButton.setGeometry(QtCore.QRect(500, 560, 121, 51))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(9)
+        font.setPixelSize(14)
         font.setBold(True)
         font.setWeight(75)
         self.openButton.setFont(font)
@@ -122,7 +122,7 @@ class Ui_Dialog(object):
         self.resultLabel.setGeometry(QtCore.QRect(650, 570, 311, 31))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(9)
+        font.setPixelSize(14)
         font.setBold(True)
         font.setWeight(75)
         self.resultLabel.setFont(font)
