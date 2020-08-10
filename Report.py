@@ -36,14 +36,14 @@ class Report(QDialog):
     def checkFile(self):
         try:
             if os.path.exists(self.log_file):
-                df = pd.read_csv(self.log_file)
+                df = pd.read_csv(self.log_file, keep_default_na=False)
                 if len(df) == 0:
-                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Product','Instruction','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
+                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
                     df.to_csv(self.log_file, index_label=False, index=False)
             else:
-                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Product','Instruction','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
+                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
                 df.to_csv(self.log_file, index_label=False, index=False)
-            self.df = pd.read_csv(self.log_file)
+            self.df = pd.read_csv(self.log_file, keep_default_na=False)
             self.updateTable()
             
         except Exception as err:
@@ -51,17 +51,17 @@ class Report(QDialog):
             print(err)
 
         try:
-            self.productTable = pd.read_csv('ProductTable.csv')
+            self.productTable = pd.read_csv('ProductTable.csv', keep_default_na=False)
         except Exception as err:
             self.em.showMessage('Failed to load the product table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.peTable = pd.read_csv('PETable.csv')
+            self.peTable = pd.read_csv('PETable.csv', keep_default_na=False)
         except Exception as err:
             self.em.showMessage('Failed to load the PE table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.cqeTable = pd.read_csv('CQETable.csv')
+            self.cqeTable = pd.read_csv('CQETable.csv', keep_default_na=False)
         except Exception as err:
             self.em.showMessage('Failed to load the CQE table. Please close the file in use and restart the window.')
             print(err)
@@ -99,13 +99,15 @@ class Report(QDialog):
         self.ui.cqcList.setColumnWidth(4,100)
         self.ui.cqcList.setColumnWidth(5,100)
         self.ui.cqcList.setColumnWidth(6,110)
-        self.ui.cqcList.setColumnWidth(7,30)
-        self.ui.cqcList.setColumnWidth(8,30)
-        self.ui.cqcList.setColumnWidth(9,60)
-        self.ui.cqcList.setColumnWidth(10,60)
-        self.ui.cqcList.setColumnWidth(11,80)
-        self.ui.cqcList.setColumnWidth(12,80)
+        self.ui.cqcList.setColumnWidth(7,80)
+        self.ui.cqcList.setColumnWidth(8,110)
+        self.ui.cqcList.setColumnWidth(9,30)
+        self.ui.cqcList.setColumnWidth(10,30)
+        self.ui.cqcList.setColumnWidth(11,60)
+        self.ui.cqcList.setColumnWidth(12,60)
         self.ui.cqcList.setColumnWidth(13,80)
+        self.ui.cqcList.setColumnWidth(14,80)
+        self.ui.cqcList.setColumnWidth(15,80)
 
     def busy(self):
         self.ui.emailButton.setEnabled(False)
@@ -157,7 +159,7 @@ class emailThread(QThread):
                         to_list.append(email)
             mail.To = ';'.join(to_list)
             mail.CC = ';'.join(cc_list)
-            mail.HTMLBody = '<p>Dear Team,</p><p>Please refer to the CQCs that were received at the reception center today. For the un-checkout CQCs, please arrange resources for sample preparation and verification according to the instruction.' + self.df.to_html(escape=False, na_rep='N/A', border=1) + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
+            mail.HTMLBody = '<p>Dear Team,</p><p>Please refer to the CQCs that were received at the reception center today. For the un-checkout CQCs, please arrange resources for sample preparation and verification according to the instruction.<p>&nbsp;</p>' + self.df.to_html(escape=False, na_rep='N/A', border=1) + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
             mail.Save()
             self.result_signal.emit('100')
         except Exception as err:

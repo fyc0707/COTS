@@ -52,6 +52,8 @@ class Receipt(QDialog):
                 self.ui.peEdit.setText(self.productTable[self.productTable['PART_TYPE_NAME']==self.ui.partNameEdit.text()]['PE_NAME'].iloc[0])
             self.ui.qtyEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Qty'].iloc[0]))
             self.ui.instruEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Instruction'].iloc[0]))
+            self.ui.traceCodeEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Trace Code'].iloc[0]))
+            self.ui.shipEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Ship Ref.'].iloc[0]))
         else:
             self.thread = fillInfoThread(self.cs, cqc_num)
             self.ui.rcvBox.setChecked(False)
@@ -65,9 +67,11 @@ class Receipt(QDialog):
         if signal==101:
             self.em.showMessage('CQC system handling error. Please contact COTS admin.')
             self.release()
+            self.thread.exit()
         elif signal==103:
             self.em.showMessage('Session expired. Please restart the application.')
             self.release()
+            self.thread.exit()
         else:
             self.ui.cqeEdit.setText(self.thread.cqe)
             self.ui.partNameEdit.setText(self.thread.product)
@@ -79,6 +83,7 @@ class Receipt(QDialog):
             except:
                 pass
             self.release()
+            self.thread.exit()
 
 
     def itemSelected(self):
@@ -87,8 +92,12 @@ class Receipt(QDialog):
         self.ui.cqcNumEdit.setText(self.rcv_df['CQC#'].loc[row])
         product = self.rcv_df['Part Name'].loc[row]
         self.ui.partNameEdit.setText(product)
+        self.ui.traceCodeEdit.setText(self.rcv_df['Trace Code'].loc[row])
+        self.ui.shipEdit.setText(self.rcv_df['Ship Ref.'].loc[row])
         if product in self.productTable['PART_TYPE_NAME'].values:
-            self.ui.peEdit.setText(self.productTable[self.productTable['PART_TYPE_NAME']==product]['PE_NAME'].iloc[0])
+            self.ui.peEdit.setText(str(self.productTable[self.productTable['PART_TYPE_NAME']==product]['PE_NAME'].iloc[0]))
+        else:
+            pass
         self.ui.cqeEdit.setText(self.rcv_df['CQE'].loc[row])
         self.ui.qtyEdit.setText(self.rcv_df['Qty'].loc[row])
         self.ui.instruEdit.setText(self.rcv_df['Instruction'].loc[row])
@@ -104,14 +113,16 @@ class Receipt(QDialog):
                 self.data = None
             else:
                 self.data = self.data.split('/\\')
-                if len(self.data)==10:
-                    cqc_num, qty, cqe, pe, pem, part_name, ins, rcv, prp, time = self.data
+                if len(self.data)==12:
+                    cqc_num, qty, code, ship, cqe, pe, pem, part_name, ins, rcv, prp, time = self.data
                     self.ui.cqcNumEdit.setText(cqc_num)
                     self.ui.partNameEdit.setText(part_name)
                     self.ui.qtyEdit.setText(qty)
                     self.ui.cqeEdit.setText(cqe)
                     self.ui.peEdit.setText(pe)
                     self.ui.instruEdit.setText(ins)
+                    self.ui.traceCodeEdit.setText(code)
+                    self.ui.shipEdit.setText(ship)
                 else:
                     self.data = None
                     self.em.showMessage('Unidentified QR code.')
@@ -180,7 +191,7 @@ class Receipt(QDialog):
         if mode == [False]*4:
             self.em.showMessage('Please check options.')
         else:           
-            cqc_info = [self.ui.cqcNumEdit.text(), self.ui.partNameEdit.text(), self.ui.qtyEdit.text(), 
+            cqc_info = [self.ui.cqcNumEdit.text(), self.ui.partNameEdit.text(), self.ui.qtyEdit.text(), self.ui.traceCodeEdit.text(), self.ui.shipEdit.text(),
                 self.ui.cqeEdit.text(), pe, pem, self.ui.instruEdit.text(), event, cqc_type, b2b]
             
             self.thread = checkinThread(self.cs, mode, cqc_info, log)
@@ -188,6 +199,7 @@ class Receipt(QDialog):
             self.thread.status_signal.connect(self.checkinCallBack)
             self.thread.start()
             self.busy()
+            
     
     def checkinCallBack(self, signal):
         if type(signal)==str:
@@ -221,28 +233,29 @@ class Receipt(QDialog):
                 self.rcv_df.reset_index(drop=True, inplace=True)
                 model = pandasModel(self.rcv_df.drop(['Event', 'B2B'], axis=1))
                 self.ui.cqcList.setModel(model)
-                self.ui.cqcList.setColumnWidth(0,55)
+                self.ui.cqcList.setColumnWidth(0,60)
                 self.ui.cqcList.setColumnWidth(1,30)
-                self.ui.cqcList.setColumnWidth(2,90)
-                self.ui.cqcList.setColumnWidth(3,85)
-                self.ui.cqcList.setColumnWidth(4,85)
+                self.ui.cqcList.setColumnWidth(2,135)
+                self.ui.cqcList.setColumnWidth(3,110)
+                self.ui.cqcList.setColumnWidth(4,90)
                 self.ui.cqcList.setColumnWidth(5,28)
+                self.ui.cqcList.setColumnWidth(6,100)
                 self.ui.cqcList.setColumnWidth(6,90)
-                self.ui.cqcList.setColumnWidth(7,160)
+                self.ui.cqcList.setColumnWidth(8,180)
             else:
                 self.ui.cqcListLable.setText('No list found')
             if not os.path.exists(self.log_file):
-                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Product','Instruction','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
+                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
                 df.to_csv(self.log_file, index_label=False)
             else:
                 df = pd.read_csv(self.log_file)
                 if len(df) == 0:
-                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Product','Instruction','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
+                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
                     df.to_csv(self.log_file, index_label=False, index=False)
         except:
             self.em.showMessage('The file is being used by another process. Please close the file and retry.')
         try:
-            self.productTable = pd.read_csv('ProductTable.csv')
+            self.productTable = pd.read_csv('ProductTable.csv', keep_default_na=False)
             completer = QCompleter(self.productTable['PART_TYPE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -251,7 +264,7 @@ class Receipt(QDialog):
             self.em.showMessage('Failed to load the product table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.peTable = pd.read_csv('PETable.csv')
+            self.peTable = pd.read_csv('PETable.csv', keep_default_na=False)
             completer = QCompleter(self.peTable['PE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -260,7 +273,7 @@ class Receipt(QDialog):
             self.em.showMessage('Failed to load the PE table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.cqeTable = pd.read_csv('CQETable.csv')
+            self.cqeTable = pd.read_csv('CQETable.csv', keep_default_na=False)
             completer = QCompleter(self.cqeTable['CQE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -279,6 +292,8 @@ class Receipt(QDialog):
         self.ui.peEdit.clear()
         self.ui.qtyEdit.clear()
         self.ui.instruEdit.clear()
+        self.ui.traceCodeEdit.clear()
+        self.ui.shipEdit.clear()
         if self.ui.prpBox.isCheckable():
             self.ui.rcvBox.setChecked(True)
             self.ui.prpBox.setChecked(True)
@@ -410,8 +425,8 @@ class checkinThread(QThread):
 
     def run(self):
         try:
-            self.log = pd.read_csv(self.log_file)
-            cqc_num, part_name, qty, cqe, pe, pem, ins, event, cqc_type, b2b = self.cqc_info
+            self.log = pd.read_csv(self.log_file, keep_default_na=False)
+            cqc_num, part_name, qty, code, ship, cqe, pe, pem, ins, event, cqc_type, b2b = self.cqc_info
             progress = 0
             taskqty = 1 + self.mode.count(True)
             results = [False]*3
@@ -458,7 +473,7 @@ class checkinThread(QThread):
                     self.progress_signal.emit(103)
                 
             if self.mode[1]:
-                if self.printLabel(cqc_num, qty, cqe, pe, pem, part_name, ins, results[2], results[1], time):
+                if self.printLabel(cqc_num, qty, code, ship, cqe, pe, pem, part_name, ins, results[2], results[1], time):
                     self.status_signal.emit('Label printed. ')
                     self.progress_signal.emit(int((progress+1)*100/taskqty))
                     results[0] = True
@@ -474,7 +489,7 @@ class checkinThread(QThread):
             success = False
         try:
             
-            self.log.loc[len(self.log)] = [cqc_num, qty, cqe, pe, pem, part_name, ins, 
+            self.log.loc[len(self.log)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship,
                                                 results[2], results[1], True, 
                                                 '', time.strftime('%d/%m/%Y %H:%M'), '','']
             self.log.to_csv(self.log_file, index_label=False, index=False)
@@ -485,10 +500,10 @@ class checkinThread(QThread):
             self.progress_signal.emit(104)
             print(err)
       
-    def printLabel(self, cqc_num, qty, cqe, pe, pem, part_name, ins, rcv, prp, time):
+    def printLabel(self, cqc_num, qty, code, ship, cqe, pe, pem, part_name, ins, rcv, prp, time):
         try: 
             style = PS('style', fontName="Helvetica-Bold", fontSize=8, leading=9, alignment=0)
-            story = canvas.Canvas('label.pdf', (6*cm, 4*cm))
+            story = canvas.Canvas('log/label.pdf', (6*cm, 4*cm))
             story.setFont('Helvetica-Bold',8)
             story.drawRightString(5.8*cm, 3.6*cm, cqc_num)
             story.drawString(0.2*cm, 3.6*cm, 'Product:')
@@ -509,7 +524,7 @@ class checkinThread(QThread):
             p = Paragraph('Instruction: '+ins, style)
             x, y = p.wrap(5.6*cm, 18)
             p.drawOn(story, 0.2*cm, 3.6*cm-70-y)
-            data = [cqc_num, qty, cqe, pe, pem, part_name, ins, str(rcv), str(prp), str(datetime.timestamp(time))]
+            data = [cqc_num, qty, code, ship, cqe, pe, pem, part_name, ins, str(rcv), str(prp), str(datetime.timestamp(time))]
             qrcode = qr.QRCode(
                 error_correction=qr.constants.ERROR_CORRECT_L,
                 box_size=5,
@@ -518,17 +533,17 @@ class checkinThread(QThread):
             qrcode.add_data('/\\'.join(data))
             qrcode.make(fit=True)
             qrcode = qrcode.make_image(fill_color="black", back_color="white")
-            qrcode.save('qr.png',format='png')
-            story.drawImage('qr.png', 4*cm, 1.3*cm, width=1.9*cm, height=1.9*cm, preserveAspectRatio=True)
-            os.remove('qr.png')
+            qrcode.save('log/qr.png',format='png')
+            story.drawImage('log/qr.png', 4*cm, 1.3*cm, width=1.9*cm, height=1.9*cm, preserveAspectRatio=True)
+            os.remove('log/qr.png')
             story.save()
             args = 'gswin32c -dPrinted -dNOPAUSE -dBATCH -dNOSAFER -q -dNOPROMPT -dNumCopies=1 -dFitPage -sDEVICE=mswinpr2 ' \
                 '-dDEVICEWIDTHPOINTS=170 ' \
                 '-dDEVICEHEIGHTPOINTS=113 ' \
                 '-sOutputFile="%printer%Deli DL-886A" ' \
-                '"label.pdf"'
+                '"log/label.pdf"'
             subprocess.call(args, shell=True)
-            os.remove('label.pdf')
+            os.remove('log/label.pdf')
             return True
         except Exception as err:
             print(err)

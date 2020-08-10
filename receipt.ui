@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1020</width>
-    <height>550</height>
+    <width>1280</width>
+    <height>670</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -18,8 +18,8 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>1020</width>
-    <height>550</height>
+    <width>1280</width>
+    <height>750</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>860</x>
+     <x>1110</x>
      <y>10</y>
      <width>151</width>
      <height>51</height>
@@ -98,7 +98,7 @@
     <rect>
      <x>0</x>
      <y>60</y>
-     <width>1021</width>
+     <width>1281</width>
      <height>20</height>
     </rect>
    </property>
@@ -140,7 +140,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>520</y>
+     <y>640</y>
      <width>311</width>
      <height>21</height>
     </rect>
@@ -212,7 +212,7 @@
      <x>320</x>
      <y>70</y>
      <width>16</width>
-     <height>471</height>
+     <height>601</height>
     </rect>
    </property>
    <property name="frameShadow">
@@ -320,7 +320,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>320</y>
+     <y>440</y>
      <width>111</width>
      <height>16</height>
     </rect>
@@ -347,7 +347,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>340</y>
+     <y>460</y>
      <width>161</width>
      <height>31</height>
     </rect>
@@ -374,7 +374,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>380</y>
+     <y>500</y>
      <width>111</width>
      <height>16</height>
     </rect>
@@ -401,7 +401,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>400</y>
+     <y>520</y>
      <width>161</width>
      <height>31</height>
     </rect>
@@ -428,7 +428,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>260</y>
+     <y>310</y>
      <width>121</width>
      <height>20</height>
     </rect>
@@ -455,7 +455,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>220</y>
+     <y>270</y>
      <width>121</width>
      <height>20</height>
     </rect>
@@ -482,7 +482,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>300</y>
+     <y>350</y>
      <width>121</width>
      <height>20</height>
     </rect>
@@ -509,7 +509,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>340</y>
+     <y>390</y>
      <width>121</width>
      <height>20</height>
     </rect>
@@ -533,9 +533,9 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>390</y>
+     <y>500</y>
      <width>121</width>
-     <height>101</height>
+     <height>111</height>
     </rect>
    </property>
    <property name="font">
@@ -573,7 +573,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>490</y>
+     <y>610</y>
      <width>321</width>
      <height>21</height>
     </rect>
@@ -600,7 +600,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>460</y>
+     <y>580</y>
      <width>161</width>
      <height>31</height>
     </rect>
@@ -627,7 +627,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>440</y>
+     <y>560</y>
      <width>111</width>
      <height>16</height>
     </rect>
@@ -655,8 +655,8 @@
     <rect>
      <x>340</x>
      <y>80</y>
-     <width>671</width>
-     <height>461</height>
+     <width>921</width>
+     <height>571</height>
     </rect>
    </property>
    <property name="font">
@@ -752,7 +752,7 @@ QHeaderView::section{
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="qtyEdit">
+  <widget class="QLineEdit" name="traceCodeEdit">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -800,7 +800,7 @@ QHeaderView::section{
     <enum>Qt::NoFocus</enum>
    </property>
    <property name="text">
-    <string>Received Quantity</string>
+    <string>Marked Trace Code</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -820,6 +820,114 @@ QHeaderView::section{
    </property>
    <property name="text">
     <string>PushButton</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="qtyEdit">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>340</y>
+     <width>161</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>320</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>9</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string>Received Quantity</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="shipEdit">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>400</y>
+     <width>161</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>380</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>9</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string>Shipping Ref.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
   <zorder>listenerButton</zorder>
@@ -849,16 +957,23 @@ QHeaderView::section{
   <zorder>label_5</zorder>
   <zorder>cqcList</zorder>
   <zorder>fillInfoButton</zorder>
-  <zorder>qtyEdit</zorder>
+  <zorder>traceCodeEdit</zorder>
   <zorder>label_6</zorder>
+  <zorder>qtyEdit</zorder>
+  <zorder>label_7</zorder>
+  <zorder>shipEdit</zorder>
+  <zorder>label_8</zorder>
  </widget>
  <tabstops>
   <tabstop>cqcNumEdit</tabstop>
   <tabstop>partNameEdit</tabstop>
+  <tabstop>traceCodeEdit</tabstop>
   <tabstop>qtyEdit</tabstop>
+  <tabstop>shipEdit</tabstop>
   <tabstop>cqeEdit</tabstop>
   <tabstop>peEdit</tabstop>
   <tabstop>instruEdit</tabstop>
+  <tabstop>listenerButton</tabstop>
  </tabstops>
  <resources>
   <include location="receipt_resource.qrc"/>

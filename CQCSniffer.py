@@ -97,13 +97,13 @@ class CQCSniffer:
 
 
     def getWIPData(self, fp):
-        df = pd.read_excel(fp, header=7).astype(str)
+        df = pd.read_excel(fp, header=7, keep_default_na=False).astype(str)
         for i, row in df.iterrows():
-            if row['Part Type Name']=='nan':
+            if row['Part Type Name']=='':
                 row['Part Type Name'] = row['Part Type']
         df = df.drop(['Part Type'], axis=1)
         df = df.drop(['2nd UD field Reception'], axis=1)
-        df.columns = ['CQC#','Type','CQE','Customer','Part Name','Qty', 'Trace Code','Instruction', 'Event', 'B2B']
+        df.columns = ['CQC#','Type','CQE','Customer','Part Name','Qty', 'Trace Code', 'Ship Ref.','Instruction', 'Event', 'B2B']
         df['B2B'] = df['B2B'].apply(lambda x: False if pd.isna(x) else True)
         df['Instruction'] = df['Instruction'].apply(lambda x: str(x)[19:])
         return df

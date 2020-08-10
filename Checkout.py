@@ -35,7 +35,7 @@ class Checkout(QDialog):
             if self.data == None:
                 cqc_num = self.ui.cqcNumEdit.text()
                 pe = self.ui.peEdit.text()
-                if pe in self.peTable['PART_TYPE_NAME'].values:
+                if pe in self.peTable['PE_NAME'].values:
                     pem = self.peTable[self.peTable['PE_NAME']==pe]['MANAGER'].iloc[0]
                 else:
                     pem = ''
@@ -45,11 +45,11 @@ class Checkout(QDialog):
                 row = []
                 if cqc_num in self.df['CQC#'].values:
                     temp = self.df[self.df['CQC#']==cqc_num]
-                    temp = temp[temp['Checkout'].isna()]
+                    temp = temp[temp['Checkout']=='']
                     if not len(temp) == 0:
                         index = temp.index.to_list()[-1]
                         for col, x in self.df.iloc[index].iteritems():
-                            if pd.isna(x):
+                            if x=='':
                                 if col == 'CQE':
                                     x = cqe
                                 elif col == 'PE':
@@ -69,22 +69,22 @@ class Checkout(QDialog):
                         print(row)
                         self.df.iloc[index] = row
                     else:
-                        self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, '', part_name, '', '', '', '', True, '', checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
+                        self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name, '', '','', '', '', True, '', checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
                 else:
-                    self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, '', part_name, '', '', '', '', True, '', checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
+                    self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name, '', '', '', '', '', True, '', checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
             else:
-                cqc_num, qty, cqe, pe, pem, part_name, ins, rcv, prp, time = self.data
+                cqc_num, qty, code, ship, cqe, pe, pem, part_name, ins, rcv, prp, time = self.data
                 time = datetime.fromtimestamp(float(time)).strftime('%d/%m/%Y %H:%M')
                 dest = self.ui.destEdit.currentText()
                 row = []
                 self.data = None
                 if cqc_num in self.df['CQC#'].values:
                     temp = self.df[self.df['CQC#']==cqc_num]
-                    temp = temp[temp['Checkout'].isna()]
+                    temp = temp[temp['Checkout']=='']
                     if not len(temp) == 0:
                         index = temp.index.to_list()[-1]
                         for col, x in self.df.iloc[index].iteritems():
-                            if pd.isna(x):
+                            if x=='':
                                 if col == 'CQE':
                                     x = cqe
                                 elif col == 'qty':
@@ -95,11 +95,15 @@ class Checkout(QDialog):
                                     x = part_name
                                 elif col == 'PE Manager':
                                     x = pem
-                                elif col == 'ins':
+                                elif col == 'Instruction':
                                     x = ins
-                                elif col == 'rcv':
+                                elif col == 'Trace Code':
+                                    x = code
+                                elif col == 'Ship Ref.':
+                                    x = ship
+                                elif col == 'RCV':
                                     x = rcv
-                                elif col == 'prp':
+                                elif col == 'PRP':
                                     x = prp
                                 elif col == 'Checkin':
                                     x = True
@@ -116,9 +120,9 @@ class Checkout(QDialog):
                         
                         self.df.iloc[index] = row
                     else:
-                        self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, part_name, ins, rcv, prp, True, True, time, checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
+                        self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, True, True, time, checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
                 else:
-                    self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, part_name, ins, rcv, prp, True, True, time, checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
+                    self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, True, True, time, checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
 
 
             self.df.to_csv(self.log_file, index_label=False, index=False)
@@ -127,6 +131,7 @@ class Checkout(QDialog):
         
         except Exception as err:
             print(err)
+            self.reset()
             self.ui.resultLabel.setText(cqc_num+' checkout failed.')
 
     @pyqtSlot()
@@ -144,8 +149,8 @@ class Checkout(QDialog):
                 self.data = None
             else:
                 self.data = self.data.split('/\\')
-                if len(self.data)==10:
-                    cqc_num, qty, cqe, pe, pem, part_name, ins, rcv, prp, time = self.data
+                if len(self.data)==12:
+                    cqc_num, qty, code, ship, cqe, pe, pem, part_name, ins, rcv, prp, time = self.data
                     self.ui.cqcNumEdit.setText(cqc_num)
                     self.ui.partNameEdit.setText(part_name)
                     self.ui.cqeEdit.setText(cqe)
@@ -161,20 +166,20 @@ class Checkout(QDialog):
     def checkFile(self):
         try:
             if not os.path.exists(self.log_file):
-                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Product','Instruction','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
+                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
                 df.to_csv(self.log_file, index_label=False, index=False)
             else:
-                df = pd.read_csv(self.log_file)
+                df = pd.read_csv(self.log_file, keep_default_na=False)
                 if len(df) == 0:
-                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Product','Instruction','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
+                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
                     df.to_csv(self.log_file, index_label=False, index=False)
             
-            self.df = pd.read_csv(self.log_file)
+            self.df = pd.read_csv(self.log_file, keep_default_na=False)
         except Exception as err:
             print(err)
 
         try:
-            self.productTable = pd.read_csv('ProductTable.csv')
+            self.productTable = pd.read_csv('ProductTable.csv', keep_default_na=False)
             completer = QCompleter(self.productTable['PART_TYPE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -183,7 +188,7 @@ class Checkout(QDialog):
             self.em.showMessage('Failed to load the product table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.peTable = pd.read_csv('PETable.csv')
+            self.peTable = pd.read_csv('PETable.csv', keep_default_na=False)
             completer = QCompleter(self.peTable['PE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -192,7 +197,7 @@ class Checkout(QDialog):
             self.em.showMessage('Failed to load the PE table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.cqeTable = pd.read_csv('CQETable.csv')
+            self.cqeTable = pd.read_csv('CQETable.csv', keep_default_na=False)
             completer = QCompleter(self.cqeTable['CQE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
