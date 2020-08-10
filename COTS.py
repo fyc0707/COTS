@@ -70,7 +70,7 @@ class Mainwindow(QMainWindow):
                 self.myDialog = Checkout.Checkout()
             elif sender == 'CQC WIP Report':
                 self.myDialog = Report.Report(self.cs)
-            elif sender == 'JERBOA Queue':
+            elif sender == 'SICAT Queue':
                 self.myDialog = Jerboa.Jerboa()
             elif sender == 'Barcode Scanner':
                 self.myDialog = Barcode_w.Barcode()
