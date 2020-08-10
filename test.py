@@ -5,7 +5,11 @@ import pandas as pd
 log = 'log/'+datetime.today().date().isoformat()+'/log.csv'
 
 print(datetime.now().strftime('%d/%m/%Y %H:%M'))
-
+from win32com.client import Dispatch
+obj = Dispatch('Outlook.Application')
+mail = obj.CreateItem(0)
+mail.Subject = 'Report of Received CQCs '
+mail.Save()
 
 '''
 field = [

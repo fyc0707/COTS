@@ -99,7 +99,7 @@ class Ui_Dialog(object):
         self.cqcNumEdit.setGeometry(QtCore.QRect(20, 100, 161, 31))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPixelSize(15)
+        font.setPixelSize(17)
         font.setBold(True)
         font.setWeight(75)
         self.cqcNumEdit.setFont(font)

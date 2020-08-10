@@ -35,9 +35,13 @@ class Ui_MainWindow(object):
         self.centralwidget.setMaximumSize(QtCore.QSize(790, 400))
         self.centralwidget.setAutoFillBackground(False)
         self.centralwidget.setObjectName("centralwidget")
+        font = QtGui.QFont()
+        font.setFamily("Calibri")
+        font.setPixelSize(16)
         self.about = QtWidgets.QLabel(self.centralwidget)
-        self.about.setGeometry(QtCore.QRect(600, 0, 181, 91))
-        self.about.setTextFormat(QtCore.Qt.RichText)
+        self.about.setGeometry(QtCore.QRect(540, 0, 241, 91))
+        self.about.setTextFormat(QtCore.Qt.PlainText)
+        self.about.setFont(font)
         self.about.setScaledContents(False)
         self.about.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.about.setWordWrap(False)
@@ -202,7 +206,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "CQC Operation Tracking System - NXP Tianjin BL Quality"))
-        self.about.setText(_translate("MainWindow", "<html><head/><body><p>COTS Version 0.1 Alpha</p><p>Developed by Tianjin BL Quality</p><p>Contact: van.fan@nxp.com</p></body></html>"))
+        self.about.setText(_translate("MainWindow", 'COTS Version 0.1 Alpha\nDeveloped by Tianjin BL Quality\nContact: van.fan@nxp.com'))
         self.logo.setText(_translate("MainWindow", "<html><head/><body><p><img src=\":/icons/resources/img/NXP.png\"/></p></body></html>"))
         self.loginLabel.setText(_translate("MainWindow", "WBI ID:\n"
 "\n"
@@ -213,5 +217,5 @@ class Ui_MainWindow(object):
         self.reportButton.setText(_translate("MainWindow", "CQC WIP Report"))
         self.lookupButton.setText(_translate("MainWindow", " CQC Transfer    "))
         self.barcodeButton.setText(_translate("MainWindow", "QR Code Scanner"))
-        self.jerboaButton.setText(_translate("MainWindow", "Jerboa Queue"))
+        self.jerboaButton.setText(_translate("MainWindow", "SICAT Queue"))
 import qt_resource_rc
