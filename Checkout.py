@@ -176,10 +176,11 @@ class Checkout(QDialog):
             
             self.df = pd.read_csv(self.log_file, keep_default_na=False)
         except Exception as err:
+            self.em.showMessage('The log file is being used by another process. Please close the file and retry. Please also delete the log.csv file if empty.')
             print(err)
 
         try:
-            self.productTable = pd.read_csv('ProductTable.csv', keep_default_na=False)
+            self.productTable = pd.read_csv('tables/ProductTable.csv', keep_default_na=False)
             completer = QCompleter(self.productTable['PART_TYPE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -188,7 +189,7 @@ class Checkout(QDialog):
             self.em.showMessage('Failed to load the product table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.peTable = pd.read_csv('PETable.csv', keep_default_na=False)
+            self.peTable = pd.read_csv('tables/PETable.csv', keep_default_na=False)
             completer = QCompleter(self.peTable['PE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -197,7 +198,7 @@ class Checkout(QDialog):
             self.em.showMessage('Failed to load the PE table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.cqeTable = pd.read_csv('CQETable.csv', keep_default_na=False)
+            self.cqeTable = pd.read_csv('tables/CQETable.csv', keep_default_na=False)
             completer = QCompleter(self.cqeTable['CQE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)

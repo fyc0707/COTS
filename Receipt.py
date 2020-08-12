@@ -151,7 +151,7 @@ class Receipt(QDialog):
                 os.replace(self.list_file+'1', self.list_file)
                 self.ui.resultLabel.setText('Download Success')
             except:
-                self.em.showMessage('The original file is being used by another process. Please close the file and retry.')
+                self.em.showMessage('The list file is being used by another process. Please close the file and retry.')
             self.checkFile()
         else:
             self.ui.progressBar.setValue(signal)
@@ -164,10 +164,10 @@ class Receipt(QDialog):
             log = pd.read_csv(self.log_file)
             log = self.log_file
         except:
-            self.em.showMessage('The log file is being used. Please close the file and retry.')
+            self.em.showMessage('The log file is being used by another process. Please close the file and retry. Please also delete the log.csv file if empty.')
             return
         self.ui.progressBar.setValue(0)
-        self.ui.resultLabel.setText(' ')
+        self.ui.resultLabel.setText('')
         if self.ui.cqcNumEdit.text()=='':
             self.em.showMessage('Please input CQC number.')
             self.reset()
@@ -253,9 +253,9 @@ class Receipt(QDialog):
                     df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
                     df.to_csv(self.log_file, index_label=False, index=False)
         except:
-            self.em.showMessage('The file is being used by another process. Please close the file and retry.')
+            self.em.showMessage('The file is being used by another process. Please close the file and retry. Please also delete the log.csv file if empty.')
         try:
-            self.productTable = pd.read_csv('ProductTable.csv', keep_default_na=False)
+            self.productTable = pd.read_csv('tables/ProductTable.csv', keep_default_na=False)
             completer = QCompleter(self.productTable['PART_TYPE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -264,7 +264,7 @@ class Receipt(QDialog):
             self.em.showMessage('Failed to load the product table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.peTable = pd.read_csv('PETable.csv', keep_default_na=False)
+            self.peTable = pd.read_csv('tables/PETable.csv', keep_default_na=False)
             completer = QCompleter(self.peTable['PE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -273,7 +273,7 @@ class Receipt(QDialog):
             self.em.showMessage('Failed to load the PE table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.cqeTable = pd.read_csv('CQETable.csv', keep_default_na=False)
+            self.cqeTable = pd.read_csv('tables/CQETable.csv', keep_default_na=False)
             completer = QCompleter(self.cqeTable['CQE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -542,7 +542,7 @@ class checkinThread(QThread):
                 '-dDEVICEHEIGHTPOINTS=113 ' \
                 '-sOutputFile="%printer%Deli DL-886A" ' \
                 '"log/label.pdf"'
-            subprocess.call(args, shell=True)
+            #subprocess.call(args, shell=True)
             os.remove('log/label.pdf')
             return True
         except Exception as err:

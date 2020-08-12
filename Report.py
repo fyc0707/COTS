@@ -47,21 +47,21 @@ class Report(QDialog):
             self.updateTable()
             
         except Exception as err:
-            self.em.showMessage('Failed to load the log file. Please close the file used by other processes.')
+            self.em.showMessage('The file is being used by another process. Please close the file and retry. Please also delete the log.csv file if empty.')
             print(err)
 
         try:
-            self.productTable = pd.read_csv('ProductTable.csv', keep_default_na=False)
+            self.productTable = pd.read_csv('tables/ProductTable.csv', keep_default_na=False)
         except Exception as err:
             self.em.showMessage('Failed to load the product table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.peTable = pd.read_csv('PETable.csv', keep_default_na=False)
+            self.peTable = pd.read_csv('tables/PETable.csv', keep_default_na=False)
         except Exception as err:
             self.em.showMessage('Failed to load the PE table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.cqeTable = pd.read_csv('CQETable.csv', keep_default_na=False)
+            self.cqeTable = pd.read_csv('tables/CQETable.csv', keep_default_na=False)
         except Exception as err:
             self.em.showMessage('Failed to load the CQE table. Please close the file in use and restart the window.')
             print(err)
@@ -157,7 +157,7 @@ class emailThread(QThread):
                         to_list.append(email)
             mail.To = ';'.join(to_list)
             mail.CC = ';'.join(cc_list)
-            def to_html(table):
+            def to_html(table: pd.DataFrame):
                 t = HTMLTable()
                 l = list()
                 t.append_header_rows([table.columns.values.tolist()])
@@ -173,7 +173,8 @@ class emailThread(QThread):
                             'border-color': '#000',
                             'border-width': '1px',
                             'border-style': 'solid',
-                            'border-collapse': 'collapse'
+                            'border-collapse': 'collapse',
+                            'padding':'4'
                         })
                 t.set_header_row_style({'background-color': '#7bb1db'})
                 return t.to_html()

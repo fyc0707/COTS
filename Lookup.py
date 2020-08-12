@@ -8,6 +8,7 @@ pythoncom.CoInitialize()
 from PyQt5.QtCore import QAbstractTableModel, Qt, QThread, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QCompleter, QDialog, QErrorMessage, QMessageBox
 from win32com.client import Dispatch
+from HTMLTable import HTMLTable
 
 import CQCSniffer
 import Ui_lookup
@@ -35,7 +36,7 @@ class Lookup(QDialog):
 
     def transfer(self):
         try:
-            self.ui.resultLabel.settext('')
+            self.ui.resultLabel.setText('')
             if (self.ui.prpBox.isChecked() or self.ui.tstBox.isChecked()):
                 if re.match(r'^[0-9]{6}[A-Z]{1}$', self.ui.cqcNumEdit.text()):
                     cqc_num = self.ui.cqcNumEdit.text()
@@ -164,7 +165,7 @@ class Lookup(QDialog):
 
     def checkFile(self):
         try:
-            self.productTable = pd.read_csv('ProductTable.csv', keep_default_na=False)
+            self.productTable = pd.read_csv('tables/ProductTable.csv', keep_default_na=False)
             completer = QCompleter(self.productTable['PART_TYPE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -173,7 +174,7 @@ class Lookup(QDialog):
             self.em.showMessage('Failed to load the product table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.peTable = pd.read_csv('PETable.csv', keep_default_na=False)
+            self.peTable = pd.read_csv('tables/PETable.csv', keep_default_na=False)
             completer = QCompleter(self.peTable['PE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -182,7 +183,7 @@ class Lookup(QDialog):
             self.em.showMessage('Failed to load the PE table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.cqeTable = pd.read_csv('CQETable.csv', keep_default_na=False)
+            self.cqeTable = pd.read_csv('tables/CQETable.csv', keep_default_na=False)
             completer = QCompleter(self.cqeTable['CQE_NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -291,7 +292,23 @@ class emailThread(QThread):
                         cc_list.append(email)
             mail.To = ';'.join(to_list)
             mail.CC = ';'.join(cc_list)
-            mail.HTMLBody = '<p>Dear Team,</p><p>Please collect your CQCs at the reception center (temporary working area on the ground floor of ATTJ).<p>&nbsp;</p>' + self.queue.to_html(escape=False, na_rep='N/A', border=1) + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
+            def to_html(table: pd.DataFrame):
+                t = HTMLTable()
+                l = list()
+                t.append_header_rows([table.columns.values.tolist()])
+                for index, row in table.iterrows():
+                    l.append(row.to_list())  
+                t.append_data_rows(l)
+                t.set_cell_style({
+                            'border-color': '#000',
+                            'border-width': '1px',
+                            'border-style': 'solid',
+                            'border-collapse': 'collapse',
+                            'padding':'4'
+                        })
+                t.set_header_row_style({'background-color': '#7bb1db'})
+                return t.to_html()
+            mail.HTMLBody = '<p>Dear Team,</p><p>Please collect your CQCs at the reception center (temporary working area on the ground floor of ATTJ).<p>&nbsp;</p>' + to_html(self.queue) + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
             mail.Save()
             self.result_signal.emit('100')
         except Exception as err:
