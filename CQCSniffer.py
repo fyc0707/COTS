@@ -93,7 +93,7 @@ class CQCSniffer:
 
 
     def logOut(self):
-        self.session.get(self.url+'login.do?method=logout')
+        self.session.get(self.url+'login.do?method=logout', verify=False, headers=self.headers, timeout=700)
 
 
     def getWIPData(self, fp):

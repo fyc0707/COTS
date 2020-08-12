@@ -3,9 +3,11 @@ from datetime import datetime
 
 import pandas as pd
 import pythoncom
+pythoncom.CoInitialize()
 from PyQt5.QtCore import QAbstractTableModel, Qt, QThread, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QDialog, QErrorMessage, QHeaderView, QMessageBox
 from win32com.client import Dispatch
+from HTMLTable import HTMLTable
 
 import CQCSniffer
 import Ui_report
@@ -22,9 +24,7 @@ class Report(QDialog):
         self.ui.welcomeLabel.setText('Welcome, ' + self.cs.user_name)
         self.list_file = 'log/'+datetime.today().date().isoformat()+'/wipList.xlsx'
         self.log_file = 'log/'+datetime.today().date().isoformat()+'/log.csv'
-        pythoncom.CoInitialize()
         self.checkFile()
-        
 
     def openWith(self):
         try:
@@ -72,18 +72,15 @@ class Report(QDialog):
             return
         self.thread = emailThread(self.cs, self.df, self.cqeTable, self.peTable)
         self.thread.result_signal.connect(self.emailCallBack)
-        pythoncom.CoInitialize()
         self.thread.start()
         self.busy()
     
     def emailCallBack(self, signal):
         if signal == '100':
             self.ui.resultLabel.setText('Email sent successfully.')
-            pythoncom.CoUninitialize()
             self.release()
         else:
             self.ui.resultLabel.setText('Email failed.')
-            pythoncom.CoUninitialize()
             self.release()
 
 
@@ -128,9 +125,10 @@ class emailThread(QThread):
         self.cqeTable = cqeTable
         self.peTable = peTable
         self.cs = cs
-        pythoncom.CoInitialize()
+
     def run(self):
         try:
+            pythoncom.CoInitialize()
             date = str(datetime.today().date())
             obj = Dispatch('Outlook.Application')
             mail = obj.CreateItem(0)
@@ -159,7 +157,28 @@ class emailThread(QThread):
                         to_list.append(email)
             mail.To = ';'.join(to_list)
             mail.CC = ';'.join(cc_list)
-            mail.HTMLBody = '<p>Dear Team,</p><p>Please refer to the CQCs that were received at the reception center today. For the un-checkout CQCs, please arrange resources for sample preparation and verification according to the instruction.<p>&nbsp;</p>' + self.df.to_html(escape=False, na_rep='N/A', border=1) + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
+            def to_html(table):
+                t = HTMLTable()
+                l = list()
+                t.append_header_rows([table.columns.values.tolist()])
+                for index, row in table.iterrows():
+                    l.append(row.to_list())  
+                t.append_data_rows(l)
+                for r in t.iter_data_rows():
+                    if r[12].value == 'True' or r[12].value == 'TRUE':
+                        pass
+                    else:
+                        r.set_style({'background-color': '#f9b500'})
+                t.set_cell_style({
+                            'border-color': '#000',
+                            'border-width': '1px',
+                            'border-style': 'solid',
+                            'border-collapse': 'collapse'
+                        })
+                t.set_header_row_style({'background-color': '#7bb1db'})
+                return t.to_html()
+
+            mail.HTMLBody = '<p>Dear Team,</p><p>Please refer to the CQCs that were received at the reception center today. For the un-checkout CQCs (in orange), please arrange resources for sample preparation and verification according to the instruction. For the CQCs that need sample cleaning, notification emails will be sent to the responsible engineers when the CQCs are ready to collect.<p>&nbsp;</p>' + to_html(self.df) + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
             mail.Save()
             self.result_signal.emit('100')
         except Exception as err:

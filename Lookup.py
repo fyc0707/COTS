@@ -4,6 +4,7 @@ from datetime import datetime
 
 import pandas as pd
 import pythoncom
+pythoncom.CoInitialize()
 from PyQt5.QtCore import QAbstractTableModel, Qt, QThread, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QCompleter, QDialog, QErrorMessage, QMessageBox
 from win32com.client import Dispatch
@@ -28,13 +29,13 @@ class Lookup(QDialog):
         self.list_file = 'log/'+datetime.today().date().isoformat()+'/wipList.xlsx'
         self.log_file = 'log/'+datetime.today().date().isoformat()+'/log.csv'
         self.data = None
-        pythoncom.CoInitialize()
         self.queue = pd.DataFrame(columns=['CQC#', 'CQE', 'PE', 'Product', 'TST', 'Instruction'])
         self.checkFile()
         
 
     def transfer(self):
         try:
+            self.ui.resultLabel.settext('')
             if (self.ui.prpBox.isChecked() or self.ui.tstBox.isChecked()):
                 if re.match(r'^[0-9]{6}[A-Z]{1}$', self.ui.cqcNumEdit.text()):
                     cqc_num = self.ui.cqcNumEdit.text()
@@ -259,10 +260,10 @@ class emailThread(QThread):
         self.cqeTable = cqeTable
         self.peTable = peTable
         self.cs = cs
-        pythoncom.CoInitialize()
     def run(self):
         try:
             date = str(datetime.today().date())
+            pythoncom.CoInitialize()
             obj = Dispatch('Outlook.Application')
             mail = obj.CreateItem(0)
             mail.Subject = 'CQCs Prepared for Collection '+date

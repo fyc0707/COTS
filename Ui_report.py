@@ -42,7 +42,7 @@ class Ui_Dialog(object):
 "    selection-background-color: rgb(249, 181, 0);\n"
 "}\n"
 "QHeaderView::section{\n"
-"    font: 75 11px \"Calibri\";\n"
+"    font: 75 13px \"Calibri\";\n"
 "    background-color: rgb(232, 232, 232);\n"
 "}")
         self.cqcList.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
@@ -62,7 +62,7 @@ class Ui_Dialog(object):
         self.welcomeLabel.setGeometry(QtCore.QRect(20, 20, 291, 31))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPixelSize(13)
+        font.setPixelSize(16)
         font.setBold(True)
         font.setWeight(75)
         self.welcomeLabel.setFont(font)
