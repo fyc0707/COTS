@@ -165,7 +165,7 @@ class emailThread(QThread):
                     l.append(row.to_list())  
                 t.append_data_rows(l)
                 for r in t.iter_data_rows():
-                    if r[12].value == 'True' or r[12].value == 'TRUE':
+                    if r[12].value or r[12].value == 'True' or r[12].value == 'TRUE':
                         pass
                     else:
                         r.set_style({'background-color': '#f9b500'})
@@ -179,7 +179,7 @@ class emailThread(QThread):
                 t.set_header_row_style({'background-color': '#7bb1db'})
                 return t.to_html()
 
-            mail.HTMLBody = '<p>Dear Team,</p><p>Please refer to the CQCs that were received at the reception center today. For the un-checkout CQCs (in orange), please arrange resources for sample preparation and verification according to the instruction. For the CQCs that need sample cleaning, notification emails will be sent to the responsible engineers when the CQCs are ready to collect.<p>&nbsp;</p>' + to_html(self.df) + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
+            mail.HTMLBody = '<p>Dear Team,</p><p>'+str(len(self.df))+' CQC(s) have been received at the reception center today. For the un-checkout CQCs (in orange), please arrange resources for sample preparation and verification according to the instruction. For the CQCs that need sample cleaning, notification emails will be sent to the responsible engineers when the CQCs are ready to collect.<p>&nbsp;</p>' + to_html(self.df) + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
             mail.Save()
             self.result_signal.emit('100')
         except Exception as err:

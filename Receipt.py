@@ -505,36 +505,35 @@ class checkinThread(QThread):
             style = PS('style', fontName="Helvetica-Bold", fontSize=8, leading=9, alignment=0)
             story = canvas.Canvas('log/label.pdf', (6*cm, 4*cm))
             story.setFont('Helvetica-Bold',8)
-            story.drawRightString(5.8*cm, 3.6*cm, cqc_num)
-            story.drawString(0.2*cm, 3.6*cm, 'Product:')
-            story.drawString(0.2*cm, 3.6*cm-9, part_name)
-            story.drawString(0.2*cm, 3.6*cm-22, 'CQE:')
+            story.drawRightString(6*cm, 3.7*cm, cqc_num)
+            story.drawString(0*cm, 3.7*cm, 'Product:')
+            story.drawString(0*cm, 3.7*cm-9, part_name)
+            story.drawString(0*cm, 3.7*cm-22, 'CQE:')
             #if len(cqe)>25:
             #    story.setFont('Helvetica-Bold',6)
             p = Paragraph(cqe, style)
-            x, y = p.wrap(3.5*cm, 18)
-            p.drawOn(story, 0.2*cm, 3.6*cm-22-y)
-            z = 3.6*cm-33-y
-            story.drawString(0.2*cm, z, 'PE:')
+            x, y = p.wrap(3.2*cm, 18)
+            p.drawOn(story, 0*cm, 3.7*cm-22-y)
+            z = 3.7*cm-33-y
+            story.drawString(0*cm, z, 'PE:')
             #if len(pe)>25:
             #    story.setFont('Helvetica-Bold',6)
             p = Paragraph(pe, style)
-            x, y = p.wrap(3.5*cm, 18)
-            p.drawOn(story, 0.2*cm, z-y)
+            x, y = p.wrap(3.2*cm, 18)
+            p.drawOn(story, 0*cm, z-y)
             p = Paragraph('Instruction: '+ins, style)
-            x, y = p.wrap(5.6*cm, 18)
-            p.drawOn(story, 0.2*cm, 3.6*cm-70-y)
+            x, y = p.wrap(6*cm, 18)
+            p.drawOn(story, 0*cm, 0)
             data = [cqc_num, qty, code, ship, cqe, pe, pem, part_name, ins, str(rcv), str(prp), str(datetime.timestamp(time))]
             qrcode = qr.QRCode(
-                error_correction=qr.constants.ERROR_CORRECT_L,
-                box_size=5,
-                border=2,
+                box_size=10,
+                border=1,
             )
             qrcode.add_data('/\\'.join(data))
             qrcode.make(fit=True)
             qrcode = qrcode.make_image(fill_color="black", back_color="white")
             qrcode.save('log/qr.png',format='png')
-            story.drawImage('log/qr.png', 4*cm, 1.3*cm, width=1.9*cm, height=1.9*cm, preserveAspectRatio=True)
+            story.drawImage('log/qr.png', 3.3*cm, 1*cm, width=2.7*cm, height=2.7*cm, preserveAspectRatio=True)
             os.remove('log/qr.png')
             story.save()
             args = 'gswin32c -dPrinted -dNOPAUSE -dBATCH -dNOSAFER -q -dNOPROMPT -dNumCopies=1 -dFitPage -sDEVICE=mswinpr2 ' \
@@ -542,7 +541,7 @@ class checkinThread(QThread):
                 '-dDEVICEHEIGHTPOINTS=113 ' \
                 '-sOutputFile="%printer%Deli DL-886A" ' \
                 '"log/label.pdf"'
-            #subprocess.call(args, shell=True)
+            subprocess.call(args, shell=True)
             os.remove('log/label.pdf')
             return True
         except Exception as err:

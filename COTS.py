@@ -92,13 +92,15 @@ class Mainwindow(QMainWindow):
             self.em.showMessage('Failed to log in. Please check WBI acoount, password and intranet connection.')
             
     def closeEvent(self, event):
-        result = QMessageBox.question(self, "Message", "Confirm to exit. Your account will be signed out.", QMessageBox.Yes | QMessageBox.No)
-        if(result == QMessageBox.Yes):
-            if self.logged:
+        if self.logged:
+            result = QMessageBox.question(self, "Message", "Confirm to exit. Your account will be signed out.", QMessageBox.Yes | QMessageBox.No)
+            if(result == QMessageBox.Yes):
                 self.cs.logOut()
-            event.accept()
+                event.accept()
+            else:
+                event.ignore()
         else:
-            event.ignore()
+            event.accept()
 
 
 
