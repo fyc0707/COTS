@@ -288,6 +288,11 @@ class CQCSniffer:
         try:
             cqe = cqe.split('(')[-1].split(')')[0]
             owner = owner.split('(')[-1].split(')')[0]
+            
+            if cqc_type == 'CQFS':
+                if event == 'PRP' or event == 'TST':
+                    return False
+            
             self.tryUrl('login.do?method=loadProxy&rid='+cqe)
             resp = self.tryUrl('getWorkFlowDetails.do?method=getEventsDetails&strIncidentNo='+cqc_num+'&strIncidentType='+cqc_type).text
             soup = BeautifulSoup(resp, 'html5lib')
@@ -322,7 +327,9 @@ class CQCSniffer:
                     else:
                         data[f] = ''
             
-            data['strPhase'] = 'EVAL'#soup.find('option', selected='selected')['value']
+            data['strPhase'] = 'EVAL'
+            if soup.find('option', selected='selected')['value'] != 'EVAL':
+                return False
             data['strCQINo'] = cqc_num
             data['strIncidentType'] = cqc_type
             if soup.find(id='addEventButton'):

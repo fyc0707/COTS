@@ -38,16 +38,16 @@ class Report(QDialog):
             if os.path.exists(self.log_file):
                 df = pd.read_csv(self.log_file, keep_default_na=False)
                 if len(df) == 0:
-                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
+                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Ready','Checkout','Checkin Time','Checkout Time','Destination'])
                     df.to_csv(self.log_file, index_label=False, index=False)
             else:
-                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
+                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Ready','Checkout','Checkin Time','Checkout Time','Destination'])
                 df.to_csv(self.log_file, index_label=False, index=False)
             self.df = pd.read_csv(self.log_file, keep_default_na=False)
             self.updateTable()
             
         except Exception as err:
-            self.em.showMessage('The file is being used by another process. Please close the file and retry. Please also delete the log.csv file if empty.')
+            self.em.showMessage('The log file is being used by another process. Please close the file and retry. Please also delete the log.csv file if empty.')
             print(err)
 
         try:
@@ -102,9 +102,10 @@ class Report(QDialog):
         self.ui.cqcList.setColumnWidth(10,30)
         self.ui.cqcList.setColumnWidth(11,60)
         self.ui.cqcList.setColumnWidth(12,60)
-        self.ui.cqcList.setColumnWidth(13,80)
+        self.ui.cqcList.setColumnWidth(13,60)
         self.ui.cqcList.setColumnWidth(14,80)
         self.ui.cqcList.setColumnWidth(15,80)
+        self.ui.cqcList.setColumnWidth(16,80)
 
     def busy(self):
         self.ui.emailButton.setEnabled(False)
@@ -134,7 +135,7 @@ class emailThread(QThread):
             mail = obj.CreateItem(0)
             mail.Subject = 'Report of Received CQCs '+date
             to_list = []
-            cc_list = ['helen.zhu@nxp.com;ricky.li@nxp.com;wayne.li@nxp.com;shuyuan.chai@nxp.com;xuejie.zhang@nxp.com;zhang.rui@nxp.com;yan.mu@nxp.com;da.sun@nxp.com','z.wang@nxp.com','van.fan@nxp.com','zhi.zhao@nxp.com']
+            cc_list = ['helen.zhu@nxp.com;ricky.li@nxp.com;wayne.li@nxp.com;shuyuan.chai@nxp.com;xuejie.zhang@nxp.com;zhang.rui@nxp.com;yan.mu@nxp.com','z.wang@nxp.com','van.fan@nxp.com','zhi.zhao@nxp.com']
             for i, row in self.df.iterrows():
                 if row['PE'] in self.peTable['PE_NAME'].values:
                     email = self.peTable[self.peTable['PE_NAME']==row['PE']]['PE_EMAIL'].iloc[0]
@@ -157,29 +158,33 @@ class emailThread(QThread):
                         to_list.append(email)
             mail.To = ';'.join(to_list)
             mail.CC = ';'.join(cc_list)
-            def to_html(table: pd.DataFrame):
+    
+            self.df = self.df.astype(str)
+            table_cleared = self.df[(self.df['Checkout']=='True') | (self.df['Checkout']=='TRUE')]
+            table_underway = self.df[self.df['Ready']=='']
+            table_ready = self.df[((self.df['Ready']=='True') | (self.df['Ready']=='TRUE')) & (self.df['Checkout']=='')]
+            bg = ['#f9b500','#7bb1db','#c9d200']
+            output = [table_ready, table_underway, table_cleared]
+            for i in range(3):
                 t = HTMLTable()
                 l = list()
-                t.append_header_rows([table.columns.values.tolist()])
-                for index, row in table.iterrows():
-                    l.append(row.to_list())  
-                t.append_data_rows(l)
-                for r in t.iter_data_rows():
-                    if r[12].value or r[12].value == 'True' or r[12].value == 'TRUE':
-                        pass
-                    else:
-                        r.set_style({'background-color': '#f9b500'})
-                t.set_cell_style({
-                            'border-color': '#000',
-                            'border-width': '1px',
-                            'border-style': 'solid',
-                            'border-collapse': 'collapse',
-                            'padding':'4'
-                        })
-                t.set_header_row_style({'background-color': '#7bb1db'})
-                return t.to_html()
-
-            mail.HTMLBody = '<p>Dear Team,</p><p>'+str(len(self.df))+' CQC(s) have been received at the reception center today. For the un-checkout CQCs (in orange), please arrange resources for sample preparation and verification according to the instruction. For the CQCs that need sample cleaning, notification emails will be sent to the responsible engineers when the CQCs are ready to collect.<p>&nbsp;</p>' + to_html(self.df) + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
+                t.append_header_rows([output[i].columns.values.tolist()])
+                if len(output[i]) == 0:
+                    output[i] = None
+                else:   
+                    for index, row in output[i].iterrows():
+                        l.append(row.to_list())
+                    t.append_data_rows(l)
+                    t.set_cell_style({
+                                'border-color': '#000',
+                                'border-width': '1px',
+                                'border-style': 'solid',
+                                'border-collapse': 'collapse',
+                                'padding':'4'
+                            })
+                    t.set_header_row_style({'background-color': bg[i]})
+                    output[i] = t.to_html()
+            mail.HTMLBody = '<p>Dear Team,</p><p>'+str(len(self.df))+' CQC(s) have been handled at the reception center today. For the un-checkout CQCs, please arrange resources for sample preparation and verification according to the instruction. For the CQCs that need sample cleaning, notification emails will be sent to the responsible engineers when the CQCs are ready to collect.<p>&nbsp;</p>' + (('<p>' + str(len(table_ready)) + ' CQC(s) are waiting to be collected.</p>' + output[0]) if output[0] != None else '<p>No CQC is waiting to be collected.</p>') + (('<p>' + str(len(table_underway)) + ' CQC(s) are under preparation.</p>' + output[1]) if output[1] != None else '<p>No CQC is under preparation.</p>') + (('<p>' + str(len(table_cleared)) + ' CQC(s) are already checked out.</p>' + output[2]) if output[2] != None else '<p>No CQC was checked out.</p>') + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
             mail.Save()
             self.result_signal.emit('100')
         except Exception as err:

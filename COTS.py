@@ -1,6 +1,8 @@
 #coding=utf-8
 import os
 import sys
+import re
+import pandas as pd 
 from datetime import datetime
 
 from PyQt5.QtWidgets import QApplication, QErrorMessage, QMainWindow, QMessageBox
@@ -109,9 +111,34 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     w = Mainwindow()
     w.show()
+    
+    history = os.listdir('log/')
+    lastlog = None
+    for h in history:
+        if re.match(r'^\d\d\d\d-\d\d-\d\d$', h) and os.path.exists('log/'+h+'/log.csv'):
+            time = datetime.strptime(h, '%Y-%m-%d')
+            if lastlog == None:
+                lastlog = time
+            else:
+                if time > lastlog:
+                    lastlog = time
+    lastlog = lastlog.date().isoformat() if lastlog != None else None
     log = 'log/'+datetime.today().date().isoformat()
     if os.path.exists(log):
         pass
     else:
         os.mkdir('log/'+datetime.today().date().isoformat())
+        if lastlog != None:
+            try:
+                leftover = pd.read_csv('log/'+lastlog+'/log.csv', keep_default_na=False)
+                leftover = leftover[leftover['Checkout']=='']
+                for i in leftover.index.to_list():
+                    leftover.loc[i,'Checkin'] = False
+                leftover.to_csv(log+'/log.csv', index_label=False, index=False)
+            except Exception as err:
+                print(err)
+                w.em.showMessage('Failed to acquire the log of yesterday. The program will exit. Please close the files in use and retry.')
+                w.close()
+
+    
     sys.exit(app.exec_())

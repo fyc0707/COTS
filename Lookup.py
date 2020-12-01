@@ -23,7 +23,8 @@ class Lookup(QDialog):
         if not self.cs.activeFlag:
             self.ui.prpBox.setCheckable(False)
             self.ui.tstBox.setCheckable(False)
-        
+        self.ui.prpBox.setChecked(False)
+        self.ui.tstBox.setChecked(False)
         self.em = QErrorMessage(self)
         self.em.setWindowTitle('Error')
         self.ui.welcomeLabel.setText('Welcome, ' + self.cs.user_name)
@@ -63,7 +64,92 @@ class Lookup(QDialog):
                 self.queue.loc[len(self.queue)] = [self.ui.cqcNumEdit.text(), self.ui.cqeEdit.text(), self.ui.peEdit.text(), self.ui.partNameEdit.text(), False, self.ui.insEdit.text()]
                 self.queue.drop_duplicates(['CQC#'], keep='last', ignore_index=True, inplace=True)
                 self.reset()
-                self.updateTable()                
+                self.updateTable()
+            try:
+                if self.data == None:
+                    cqc_num = self.ui.cqcNumEdit.text()
+                    pe = self.ui.peEdit.text()
+                    if pe in self.peTable['PE_NAME'].values:
+                        pem = self.peTable[self.peTable['PE_NAME']==pe]['MANAGER'].iloc[0]
+                    else:
+                        pem = ''
+                    part_name = self.ui.partNameEdit.text()
+                    cqe = self.ui.cqeEdit.text()
+                    row = []
+                    if cqc_num in self.df['CQC#'].values:
+                        temp = self.df[self.df['CQC#']==cqc_num]
+                        temp = temp[temp['Ready']=='']
+                        if not len(temp) == 0:
+                            index = temp.index.to_list()[-1]
+                            for col, x in self.df.iloc[index].iteritems():
+                                if x=='':
+                                    if col == 'CQE':
+                                        x = cqe
+                                    elif col == 'PE':
+                                        x = pe
+                                    elif col == 'Product':
+                                        x = part_name
+                                    elif col == 'PE Manager':
+                                        x = pem
+                                    elif col == 'Ready':
+                                        x = True
+                                row.append(x)
+                            self.df.iloc[index] = row
+                        else:
+                            self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name,'','','','','','',True,'','','','']
+                    else:
+                        self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name,'', '','', '','','',True,'','','','']
+                else:
+                    cqc_num, qty, code, ship, cqe, pe, pem, part_name, ins, rcv, prp, time = self.data
+                    time = datetime.fromtimestamp(float(time)).strftime('%d/%m/%Y %H:%M')
+                    row = []
+                    self.data = None
+                    if cqc_num in self.df['CQC#'].values:
+                        temp = self.df[self.df['CQC#']==cqc_num]
+                        temp = temp[temp['Ready']=='']
+                        if not len(temp) == 0:
+                            index = temp.index.to_list()[-1]
+                            for col, x in self.df.iloc[index].iteritems():
+                                if x=='':
+                                    if col == 'CQE':
+                                        x = cqe
+                                    elif col == 'qty':
+                                        x = qty
+                                    elif col == 'PE':
+                                        x = pe
+                                    elif col == 'Product':
+                                        x = part_name
+                                    elif col == 'PE Manager':
+                                        x = pem
+                                    elif col == 'Instruction':
+                                        x = ins
+                                    elif col == 'Trace Code':
+                                        x = code
+                                    elif col == 'Ship Ref.':
+                                        x = ship
+                                    elif col == 'RCV':
+                                        x = rcv
+                                    elif col == 'PRP':
+                                        x = prp
+                                    elif col == 'Checkin':
+                                        x = True
+                                    elif col == 'Ready':
+                                        x = True
+                                    elif col == 'Checkin Time':
+                                        x = time
+                                    
+                                row.append(x)
+                            
+                            self.df.iloc[index] = row
+                        else:
+                            self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, False, True,'', time,'','']
+                    else:
+                        self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, False, True,'', time,'','']
+                self.df.to_csv(self.log_file, index_label=False, index=False)
+                self.ui.resultLabel.setText(self.ui.resultLabel.text()+'Logged. ')
+            except Exception as err:
+                print(err)
+
         except Exception as err:
             print(err)  
             
@@ -71,16 +157,19 @@ class Lookup(QDialog):
         if signal=='101':
             self.em.showMessage('CQC system handling error. Please contact COTS admin.')
             self.reset()
+            self.data = None
             self.release()
             self.updateTable()
         elif signal=='103':
             self.em.showMessage('Session expired. Please restart the application.')
             self.reset()
+            self.data = None
             self.release()
             self.updateTable()
         elif signal=='100':
             self.queue.iloc[-1]['TST'] = self.thread.tst_flag
             self.reset()
+            self.data = None
             self.release()
             self.updateTable()
         else:
@@ -149,6 +238,9 @@ class Lookup(QDialog):
                     self.ui.peEdit.setText(pe)
                     self.ui.insEdit.setText(ins)
                     self.ui.transferButton.setFocus()
+                    if prp == 'True' or prp == 'TRUE':
+                        self.ui.prpBox.setChecked(True)
+                        self.ui.tstBox.setChecked(True)
                 else:
                     self.data = None
                     self.em.showMessage('Unidentified QR code.')
@@ -164,6 +256,21 @@ class Lookup(QDialog):
             event.ignore()
 
     def checkFile(self):
+        try:
+            if os.path.exists(self.log_file):
+                df = pd.read_csv(self.log_file, keep_default_na=False)
+                if len(df) == 0:
+                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Ready','Checkout','Checkin Time','Checkout Time','Destination'])
+                    df.to_csv(self.log_file, index_label=False, index=False)
+            else:
+                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Ready','Checkout','Checkin Time','Checkout Time','Destination'])
+                df.to_csv(self.log_file, index_label=False, index=False)
+            self.df = pd.read_csv(self.log_file, keep_default_na=False)
+            
+        except Exception as err:
+            self.em.showMessage('The log file is being used by another process. Please close the file and retry. Please also delete the log.csv file if empty.')
+            print(err)
+
         try:
             self.productTable = pd.read_csv('tables/ProductTable.csv', keep_default_na=False)
             completer = QCompleter(self.productTable['PART_TYPE_NAME'].values.tolist())
@@ -200,12 +307,8 @@ class Lookup(QDialog):
         self.ui.cqeEdit.clear()
         self.ui.peEdit.clear()
         self.ui.insEdit.clear()
-        if self.ui.tstBox.isCheckable():
-            self.ui.tstBox.setChecked(True)
-            self.ui.prpBox.setChecked(True)
-        else:
-            self.ui.tstBox.setChecked(False)
-            self.ui.prpBox.setChecked(False)
+        self.ui.tstBox.setChecked(False)
+        self.ui.prpBox.setChecked(False)
         self.ui.cqcNumEdit.setFocus()
 
     def busy(self):
@@ -269,7 +372,7 @@ class emailThread(QThread):
             mail = obj.CreateItem(0)
             mail.Subject = 'CQCs Prepared for Collection '+date
             to_list = []
-            cc_list = ['helen.zhu@nxp.com;ricky.li@nxp.com;wayne.li@nxp.com;shuyuan.chai@nxp.com;xuejie.zhang@nxp.com;zhang.rui@nxp.com;yan.mu@nxp.com;da.sun@nxp.com','z.wang@nxp.com','van.fan@nxp.com','zhi.zhao@nxp.com']
+            cc_list = ['helen.zhu@nxp.com;ricky.li@nxp.com;wayne.li@nxp.com;shuyuan.chai@nxp.com;xuejie.zhang@nxp.com;zhang.rui@nxp.com;yan.mu@nxp.com','z.wang@nxp.com','van.fan@nxp.com','zhi.zhao@nxp.com']
             for i, row in self.queue.iterrows():
                 if row['PE'] in self.peTable['PE_NAME'].values:
                     email = self.peTable[self.peTable['PE_NAME']==row['PE']]['PE_EMAIL'].iloc[0]
@@ -293,6 +396,7 @@ class emailThread(QThread):
             mail.To = ';'.join(to_list)
             mail.CC = ';'.join(cc_list)
             def to_html(table: pd.DataFrame):
+                table = table.astype(str)
                 t = HTMLTable()
                 l = list()
                 t.append_header_rows([table.columns.values.tolist()])

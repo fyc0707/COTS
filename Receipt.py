@@ -45,23 +45,35 @@ class Receipt(QDialog):
         cqc_num = self.ui.cqcNumEdit.text()
         self.reset()
         self.ui.cqcNumEdit.setText(cqc_num)
-        if cqc_num in self.wip_df['CQC#'].values:
-            self.ui.cqeEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['CQE'].iloc[0]))
-            self.ui.partNameEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Part Name'].iloc[0]))
-            if self.ui.partNameEdit.text() in self.productTable['PART_TYPE_NAME'].values:
-                self.ui.peEdit.setText(self.productTable[self.productTable['PART_TYPE_NAME']==self.ui.partNameEdit.text()]['PE_NAME'].iloc[0])
-            self.ui.qtyEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Qty'].iloc[0]))
-            self.ui.instruEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Instruction'].iloc[0]))
-            self.ui.traceCodeEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Trace Code'].iloc[0]))
-            self.ui.shipEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Ship Ref.'].iloc[0]))
-        else:
-            self.thread = fillInfoThread(self.cs, cqc_num)
-            self.ui.rcvBox.setChecked(False)
-            self.ui.prpBox.setChecked(False)
-            self.ui.resultLabel.setText('CQC not in WIP. Fetching data...')
-            self.thread.result_signal.connect(self.fillInfoCallBack)
-            self.thread.start()
-            self.busy()
+        try:
+            if self.wip_df is not None:
+                if cqc_num in self.wip_df['CQC#'].values:
+                    self.ui.cqeEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['CQE'].iloc[0]))
+                    self.ui.partNameEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Part Name'].iloc[0]))
+                    if self.ui.partNameEdit.text() in self.productTable['PART_TYPE_NAME'].values:
+                        self.ui.peEdit.setText(self.productTable[self.productTable['PART_TYPE_NAME']==self.ui.partNameEdit.text()]['PE_NAME'].iloc[0])
+                    self.ui.qtyEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Qty'].iloc[0]))
+                    self.ui.instruEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Instruction'].iloc[0]))
+                    self.ui.traceCodeEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Trace Code'].iloc[0]))
+                    self.ui.shipEdit.setText(str(self.wip_df[self.wip_df['CQC#']==cqc_num]['Ship Ref.'].iloc[0]))
+                else:
+                    self.thread = fillInfoThread(self.cs, cqc_num)
+                    self.ui.rcvBox.setChecked(False)
+                    self.ui.prpBox.setChecked(False)
+                    self.ui.resultLabel.setText('CQC not in WIP. Fetching data...')
+                    self.thread.result_signal.connect(self.fillInfoCallBack)
+                    self.thread.start()
+                    self.busy()
+            else:
+                self.thread = fillInfoThread(self.cs, cqc_num)
+                self.ui.rcvBox.setChecked(False)
+                self.ui.prpBox.setChecked(False)
+                self.ui.resultLabel.setText('CQC not in WIP. Fetching data...')
+                self.thread.result_signal.connect(self.fillInfoCallBack)
+                self.thread.start()
+                self.busy()
+        except Exceptiion as err:
+            print(err)
 
     def fillInfoCallBack(self, signal):
         if signal==101:
@@ -225,6 +237,8 @@ class Receipt(QDialog):
 
 
     def checkFile(self):
+        self.rcv_df = None
+        self.wip_df = None
         try: 
             if os.path.exists(self.list_file):
                 self.ui.cqcListLable.setText('Last Update:\n'+datetime.fromtimestamp(os.path.getmtime(self.list_file)).strftime('%Y-%m-%d %H:%M:%S'))
@@ -244,13 +258,15 @@ class Receipt(QDialog):
                 self.ui.cqcList.setColumnWidth(8,180)
             else:
                 self.ui.cqcListLable.setText('No list found')
+                self.wip_df = None
+                self.rcv_df = None
             if not os.path.exists(self.log_file):
-                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
+                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Ready','Checkout','Checkin Time','Checkout Time','Destination'])
                 df.to_csv(self.log_file, index_label=False)
             else:
                 df = pd.read_csv(self.log_file)
                 if len(df) == 0:
-                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Checkout','Checkin Time','Checkout Time','Destination'])
+                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Ready','Checkout','Checkin Time','Checkout Time','Destination'])
                     df.to_csv(self.log_file, index_label=False, index=False)
         except:
             self.em.showMessage('The file is being used by another process. Please close the file and retry. Please also delete the log.csv file if empty.')
@@ -490,7 +506,7 @@ class checkinThread(QThread):
         try:
             
             self.log.loc[len(self.log)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship,
-                                                results[2], results[1], True, 
+                                                results[2], results[1], True,'', 
                                                 '', time.strftime('%d/%m/%Y %H:%M'), '','']
             self.log.to_csv(self.log_file, index_label=False, index=False)
             self.progress_signal.emit(102)
