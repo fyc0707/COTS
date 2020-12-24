@@ -77,7 +77,7 @@ class Receipt(QDialog):
 
     def fillInfoCallBack(self, signal):
         if signal==101:
-            self.em.showMessage('CQC system handling error. Please contact COTS admin.')
+            self.em.showMessage('CQC system handling error. Please contact COTS developer.')
             self.release()
             self.thread.exit()
         elif signal==103:
@@ -148,6 +148,7 @@ class Receipt(QDialog):
         self.thread = downloadThread(self.cs, fileobj, 1024)
         self.thread.process_signal.connect(self.downloadCallBack)
         self.thread.start()
+        self.ui.cqcListLable.setText('Downloading')
         self.busy()
         
 
@@ -156,6 +157,7 @@ class Receipt(QDialog):
             self.release()
             self.checkFile()
             self.em.showMessage('Download failed. Please retry or restart the application.')
+            self.ui.cqcListLable.setText('No list found')
             os.remove(self.list_file+'1')
         elif signal == 102:
             self.release()
@@ -164,6 +166,7 @@ class Receipt(QDialog):
                 self.ui.resultLabel.setText('Download Success')
             except:
                 self.em.showMessage('The list file is being used by another process. Please close the file and retry.')
+                self.ui.cqcListLable.setText('No list found')
             self.checkFile()
         else:
             self.ui.progressBar.setValue(signal)
@@ -221,7 +224,7 @@ class Receipt(QDialog):
                 self.ui.resultLabel.setText(self.ui.resultLabel.text()+signal)
         else:
             if signal==101:
-                self.em.showMessage('CQC system handling error. Please contact COTS admin.')
+                self.em.showMessage('CQC system handling error. Please contact COTS developer.')
                 self.release()
             elif signal==102:
                 self.ui.progressBar.setValue(100)
@@ -261,12 +264,12 @@ class Receipt(QDialog):
                 self.wip_df = None
                 self.rcv_df = None
             if not os.path.exists(self.log_file):
-                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Ready','Checkout','Checkin Time','Checkout Time','Destination'])
+                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Status','Checkout','Checkin Time','Checkout Time','Destination'])
                 df.to_csv(self.log_file, index_label=False)
             else:
                 df = pd.read_csv(self.log_file)
                 if len(df) == 0:
-                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Ready','Checkout','Checkin Time','Checkout Time','Destination'])
+                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Status','Checkout','Checkin Time','Checkout Time','Destination'])
                     df.to_csv(self.log_file, index_label=False, index=False)
         except:
             self.em.showMessage('The file is being used by another process. Please close the file and retry. Please also delete the log.csv file if empty.')
@@ -344,15 +347,10 @@ class Receipt(QDialog):
         if self.ui.prpBox.isChecked():
             self.ui.checkOnlyBox.setChecked(False)
     @pyqtSlot()
-    def on_printBox_clicked(self):
-        if self.ui.printBox.isChecked():
-            self.ui.checkOnlyBox.setChecked(False)
-    @pyqtSlot()
     def on_checkOnlyBox_clicked(self):
         if self.ui.checkOnlyBox.isChecked():
             self.ui.rcvBox.setChecked(False)
             self.ui.prpBox.setChecked(False)
-            self.ui.printBox.setChecked(False)
 
 
     def closeEvent(self, event):
@@ -445,7 +443,7 @@ class checkinThread(QThread):
             cqc_num, part_name, qty, code, ship, cqe, pe, pem, ins, event, cqc_type, b2b = self.cqc_info
             progress = 0
             taskqty = 1 + self.mode.count(True)
-            results = [False]*3
+            results = ['N']*3
             success = True
             time = datetime.now()     
         
@@ -456,7 +454,7 @@ class checkinThread(QThread):
                             if self.cs.closeEvent(cqc_num, cqc_type, cqe, 'RCT', 'The CQC sample is received. The event is closed by Tianjin BL Quality COTS.'):
                                 self.status_signal.emit('RCT closed. ')
                                 
-                                results[2] = True
+                                results[2] = 'Y'
                             else:
                                 self.status_signal.emit('RCT not closed. ')
                                 success = False
@@ -464,7 +462,7 @@ class checkinThread(QThread):
                             if self.cs.closeRCV(cqc_num, cqc_type, b2b, cqe, qty):
                                 self.status_signal.emit('RCV closed. ')
                                 self.progress_signal.emit(int((progress+1)*100/taskqty))
-                                results[2] = True
+                                results[2] = 'Y'
                             else:
                                 self.status_signal.emit('RCV not closed. ')
                                 success = False
@@ -474,7 +472,7 @@ class checkinThread(QThread):
                         if self.cs.createAction(cqc_num, cqc_type, cqe):
                             if self.cs.createEvent(cqc_num, cqc_type, cqe, cqe, 'PRP', 'Sample cleaning. The event is created by Tianjin BL Quality COTS.'):
                                 self.status_signal.emit('PRP created. ')
-                                results[1] = True
+                                results[1] = 'Y'
                             else:
                                 self.status_signal.emit('PRP not created. ')
                                 success = False
@@ -492,7 +490,7 @@ class checkinThread(QThread):
                 if self.printLabel(cqc_num, qty, code, ship, cqe, pe, pem, part_name, ins, results[2], results[1], time):
                     self.status_signal.emit('Label printed. ')
                     self.progress_signal.emit(int((progress+1)*100/taskqty))
-                    results[0] = True
+                    results[0] = 'Y'
                 else:
                     self.status_signal.emit('Label not printed. ')
                     success = False   
@@ -504,10 +502,15 @@ class checkinThread(QThread):
             self.progress_signal.emit(101)
             success = False
         try:
-            
-            self.log.loc[len(self.log)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship,
-                                                results[2], results[1], True,'', 
+            if self.mode[0]:
+                self.log.loc[len(self.log)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship,
+                                                results[2], results[1], 'Y','S', 
                                                 '', time.strftime('%d/%m/%Y %H:%M'), '','']
+            else:
+                self.log.loc[len(self.log)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship,
+                                                results[2], results[1], 'Y','P', 
+                                                '', time.strftime('%d/%m/%Y %H:%M'), '','']
+            
             self.log.to_csv(self.log_file, index_label=False, index=False)
             self.progress_signal.emit(102)
             if success:
@@ -525,15 +528,11 @@ class checkinThread(QThread):
             story.drawString(0*cm, 3.7*cm, 'Product:')
             story.drawString(0*cm, 3.7*cm-9, part_name)
             story.drawString(0*cm, 3.7*cm-22, 'CQE:')
-            #if len(cqe)>25:
-            #    story.setFont('Helvetica-Bold',6)
             p = Paragraph(cqe, style)
             x, y = p.wrap(3.2*cm, 18)
             p.drawOn(story, 0*cm, 3.7*cm-22-y)
             z = 3.7*cm-33-y
             story.drawString(0*cm, z, 'PE:')
-            #if len(pe)>25:
-            #    story.setFont('Helvetica-Bold',6)
             p = Paragraph(pe, style)
             x, y = p.wrap(3.2*cm, 18)
             p.drawOn(story, 0*cm, z-y)
@@ -541,11 +540,9 @@ class checkinThread(QThread):
             x, y = p.wrap(6*cm, 18)
             p.drawOn(story, 0*cm, 0)
             data = [cqc_num, qty, code, ship, cqe, pe, pem, part_name, ins, str(rcv), str(prp), str(datetime.timestamp(time))]
-            qrcode = qr.QRCode(
-                box_size=10,
-                border=1,
-            )
+            qrcode = qr.QRCode(box_size=10, border=1)
             qrcode.add_data('/\\'.join(data))
+            print('/\\'.join(data))
             qrcode.make(fit=True)
             qrcode = qrcode.make_image(fill_color="black", back_color="white")
             qrcode.save('log/qr.png',format='png')
@@ -557,7 +554,7 @@ class checkinThread(QThread):
                 '-dDEVICEHEIGHTPOINTS=113 ' \
                 '-sOutputFile="%printer%Deli DL-886A" ' \
                 '"log/label.pdf"'
-            subprocess.call(args, shell=True)
+            #subprocess.call(args, shell=True)
             os.remove('log/label.pdf')
             return True
         except Exception as err:

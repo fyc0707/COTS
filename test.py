@@ -1,8 +1,4 @@
-import os
-from datetime import datetime
-import pandas as pd 
 
-print(len(None))
 
 '''
 field = [

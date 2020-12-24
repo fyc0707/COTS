@@ -206,7 +206,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "CQC Operation Tracking System - NXP Tianjin BL Quality"))
-        self.about.setText(_translate("MainWindow", 'COTS Version 0.1 Alpha\nDeveloped by Tianjin BL Quality\nContact: van.fan@nxp.com'))
+        self.about.setText(_translate("MainWindow", 'COTS Version 1.0\nDeveloped by Tianjin BL Quality\nContact: van.fan@nxp.com'))
         self.logo.setText(_translate("MainWindow", "<html><head/><body><p><img src=\":/icons/resources/img/NXP.png\"/></p></body></html>"))
         self.loginLabel.setText(_translate("MainWindow", "WBI ID:\n"
 "\n"

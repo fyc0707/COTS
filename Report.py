@@ -38,10 +38,10 @@ class Report(QDialog):
             if os.path.exists(self.log_file):
                 df = pd.read_csv(self.log_file, keep_default_na=False)
                 if len(df) == 0:
-                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Ready','Checkout','Checkin Time','Checkout Time','Destination'])
+                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Status','Checkout','Checkin Time','Checkout Time','Destination'])
                     df.to_csv(self.log_file, index_label=False, index=False)
             else:
-                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Ready','Checkout','Checkin Time','Checkout Time','Destination'])
+                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Status','Checkout','Checkin Time','Checkout Time','Destination'])
                 df.to_csv(self.log_file, index_label=False, index=False)
             self.df = pd.read_csv(self.log_file, keep_default_na=False)
             self.updateTable()
@@ -160,12 +160,13 @@ class emailThread(QThread):
             mail.CC = ';'.join(cc_list)
     
             self.df = self.df.astype(str)
-            table_cleared = self.df[(self.df['Checkout']=='True') | (self.df['Checkout']=='TRUE')]
-            table_underway = self.df[self.df['Ready']=='']
-            table_ready = self.df[((self.df['Ready']=='True') | (self.df['Ready']=='TRUE')) & (self.df['Checkout']=='')]
-            bg = ['#f9b500','#7bb1db','#c9d200']
-            output = [table_ready, table_underway, table_cleared]
-            for i in range(3):
+            table_cleared = self.df[self.df['Checkout']=='Y']
+            table_underway = self.df[(self.df['Status']=='P') & (self.df['Checkout']=='')]
+            table_ready = self.df[(self.df['Status']=='R') & (self.df['Checkout']=='')]
+            table_store = self.df[(self.df['Status']=='S') & (self.df['Checkout']=='')]
+            bg = ['#f9b500','#7bb1db','#c9d200','#00a4a7']
+            output = [table_ready, table_underway, table_cleared, table_store]
+            for i in range(4):
                 t = HTMLTable()
                 l = list()
                 t.append_header_rows([output[i].columns.values.tolist()])
@@ -184,7 +185,7 @@ class emailThread(QThread):
                             })
                     t.set_header_row_style({'background-color': bg[i]})
                     output[i] = t.to_html()
-            mail.HTMLBody = '<p>Dear Team,</p><p>'+str(len(self.df))+' CQC(s) have been handled at the reception center today. For the un-checkout CQCs, please arrange resources for sample preparation and verification according to the instruction. For the CQCs that need sample cleaning, notification emails will be sent to the responsible engineers when the CQCs are ready to collect.<p>&nbsp;</p>' + (('<p>' + str(len(table_ready)) + ' CQC(s) are waiting to be collected.</p>' + output[0]) if output[0] != None else '<p>No CQC is waiting to be collected.</p>') + (('<p>' + str(len(table_underway)) + ' CQC(s) are under preparation.</p>' + output[1]) if output[1] != None else '<p>No CQC is under preparation.</p>') + (('<p>' + str(len(table_cleared)) + ' CQC(s) are already checked out.</p>' + output[2]) if output[2] != None else '<p>No CQC was checked out.</p>') + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
+            mail.HTMLBody = '<p>Dear Team,</p><p>Please refer to the list(s) of the '+str(len(self.df))+' CQC(s) that have been handled at the reception center today. For the un-checkout CQCs, please arrange resources for sample preparation and verification according to the instruction. For the CQCs that need sample cleaning, notification emails will be sent to the responsible engineers when the CQCs are ready to collect.<p>&nbsp;</p>' + (('<p>' + str(len(table_ready)) + ' CQC(s) are waiting to be collected.</p>' + output[0]) if output[0] != None else '<p>No CQC is waiting to be collected.</p>') + (('<p>' + str(len(table_underway)) + ' CQC(s) are under preparation.</p>' + output[1]) if output[1] != None else '<p>No CQC is under preparation.</p>') + (('<p>' + str(len(table_cleared)) + ' CQC(s) have been checked out.</p>' + output[2]) if output[2] != None else '<p>No CQC was checked out.</p>') + (('<p>' + str(len(table_store)) + ' CQC(s) have been stored.</p>' + output[3]) if output[3] != None else '<p>No CQC was stored.</p>') + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
             mail.Save()
             self.result_signal.emit('100')
         except Exception as err:

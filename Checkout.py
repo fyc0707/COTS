@@ -59,18 +59,21 @@ class Checkout(QDialog):
                                 elif col == 'PE Manager':
                                     x = pem
                                 elif col == 'Checkout':
-                                    x = True
+                                    x = 'Y'
                                 elif col == 'Checkout Time':
                                     x = checkout_time.strftime('%d/%m/%Y %H:%M')
                                 elif col == 'Destination':
                                     x = dest
+                            else:
+                                    if col == 'Status':
+                                        x = 'R'
                                 
                             row.append(x)
                         self.df.iloc[index] = row
                     else:
-                        self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name, '', '','', '', '','', True, '', checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
+                        self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name, '', '','', '', '','', 'Y', '', checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
                 else:
-                    self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name, '', '', '', '', '','', True, '', checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
+                    self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name, '', '', '', '', '','', 'Y', '', checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
             else:
                 cqc_num, qty, code, ship, cqe, pe, pem, part_name, ins, rcv, prp, time = self.data
                 time = datetime.fromtimestamp(float(time)).strftime('%d/%m/%Y %H:%M')
@@ -105,25 +108,28 @@ class Checkout(QDialog):
                                 elif col == 'PRP':
                                     x = prp
                                 elif col == 'Checkin':
-                                    x = True
-                                elif col == 'Ready':
-                                    x = True
+                                    x = 'N'
+                                elif col == 'Status':
+                                    x = 'R'
                                 elif col == 'Checkout':
-                                    x = True
+                                    x = 'Y'
                                 elif col == 'Checkin Time':
                                     x = time
                                 elif col == 'Checkout Time':
                                     x = checkout_time.strftime('%d/%m/%Y %H:%M')
                                 elif col == 'Destination':
                                     x = dest
+                            else:
+                                    if col == 'Status':
+                                        x = 'R'
                                 
                             row.append(x)
                         
                         self.df.iloc[index] = row
                     else:
-                        self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, True, True, True, time, checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
+                        self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, 'Y', 'R', 'Y', time, checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
                 else:
-                    self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, False, True, True, time, checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
+                    self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, 'N', 'R', 'Y', time, checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
 
 
             self.df.to_csv(self.log_file, index_label=False, index=False)
@@ -167,12 +173,12 @@ class Checkout(QDialog):
     def checkFile(self):
         try:
             if not os.path.exists(self.log_file):
-                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Ready','Checkout','Checkin Time','Checkout Time','Destination'])
+                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Status','Checkout','Checkin Time','Checkout Time','Destination'])
                 df.to_csv(self.log_file, index_label=False, index=False)
             else:
                 df = pd.read_csv(self.log_file, keep_default_na=False)
                 if len(df) == 0:
-                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Ready','Checkout','Checkin Time','Checkout Time','Destination'])
+                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Status','Checkout','Checkin Time','Checkout Time','Destination'])
                     df.to_csv(self.log_file, index_label=False, index=False)
             
             self.df = pd.read_csv(self.log_file, keep_default_na=False)

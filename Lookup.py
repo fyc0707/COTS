@@ -46,22 +46,22 @@ class Lookup(QDialog):
                     return
                 cqe = self.ui.cqeEdit.text()
                 pe = self.ui.peEdit.text()
-                if (cqe == None or pe == None):
-                    self.em.showMessage('Please input CQE and PE information')
+                if (cqe == None and pe == None):
+                    self.em.showMessage('Please input CQE or PE information')
                     return
                 product = self.ui.partNameEdit.text()
                 ins = self.ui.insEdit.text()
                 tst_flag = False
                 cqc_info = [cqc_num, cqe, pe, product]
                 mode = [self.ui.prpBox.isChecked(), self.ui.tstBox.isChecked()]
-                self.queue.loc[len(self.queue)] = [cqc_num, cqe, pe, product, False, ins]
+                self.queue.loc[len(self.queue)] = [cqc_num, cqe, pe, product, 'N', ins]
                 self.queue.drop_duplicates(['CQC#'], keep='last', ignore_index=True, inplace=True)
                 self.thread = transferThread(self.cs, mode, cqc_info)
                 self.thread.result_signal.connect(self.transferCallBack)
                 self.thread.start()
                 self.busy()
             else:
-                self.queue.loc[len(self.queue)] = [self.ui.cqcNumEdit.text(), self.ui.cqeEdit.text(), self.ui.peEdit.text(), self.ui.partNameEdit.text(), False, self.ui.insEdit.text()]
+                self.queue.loc[len(self.queue)] = [self.ui.cqcNumEdit.text(), self.ui.cqeEdit.text(), self.ui.peEdit.text(), self.ui.partNameEdit.text(), 'N', self.ui.insEdit.text()]
                 self.queue.drop_duplicates(['CQC#'], keep='last', ignore_index=True, inplace=True)
                 self.reset()
                 self.updateTable()
@@ -78,7 +78,7 @@ class Lookup(QDialog):
                     row = []
                     if cqc_num in self.df['CQC#'].values:
                         temp = self.df[self.df['CQC#']==cqc_num]
-                        temp = temp[temp['Ready']=='']
+                        temp = temp[temp['Status']!='R']
                         if not len(temp) == 0:
                             index = temp.index.to_list()[-1]
                             for col, x in self.df.iloc[index].iteritems():
@@ -91,14 +91,17 @@ class Lookup(QDialog):
                                         x = part_name
                                     elif col == 'PE Manager':
                                         x = pem
-                                    elif col == 'Ready':
-                                        x = True
+                                    elif col == 'Status':
+                                        x = 'R'
+                                else:
+                                    if col == 'Status':
+                                        x = 'R'
                                 row.append(x)
                             self.df.iloc[index] = row
                         else:
-                            self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name,'','','','','','',True,'','','','']
+                            self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name,'','','','','','','R','','','','']
                     else:
-                        self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name,'', '','', '','','',True,'','','','']
+                        self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name,'', '','', '','','','R','','','','']
                 else:
                     cqc_num, qty, code, ship, cqe, pe, pem, part_name, ins, rcv, prp, time = self.data
                     time = datetime.fromtimestamp(float(time)).strftime('%d/%m/%Y %H:%M')
@@ -106,7 +109,7 @@ class Lookup(QDialog):
                     self.data = None
                     if cqc_num in self.df['CQC#'].values:
                         temp = self.df[self.df['CQC#']==cqc_num]
-                        temp = temp[temp['Ready']=='']
+                        temp = temp[temp['Status']!='R']
                         if not len(temp) == 0:
                             index = temp.index.to_list()[-1]
                             for col, x in self.df.iloc[index].iteritems():
@@ -132,19 +135,22 @@ class Lookup(QDialog):
                                     elif col == 'PRP':
                                         x = prp
                                     elif col == 'Checkin':
-                                        x = True
-                                    elif col == 'Ready':
-                                        x = True
+                                        x = 'N'
+                                    elif col == 'Status':
+                                        x = 'R'
                                     elif col == 'Checkin Time':
                                         x = time
+                                else:
+                                    if col == 'Status':
+                                        x = 'R'
                                     
                                 row.append(x)
                             
                             self.df.iloc[index] = row
                         else:
-                            self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, False, True,'', time,'','']
+                            self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, 'N', 'R','', time,'','']
                     else:
-                        self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, False, True,'', time,'','']
+                        self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, 'N', 'R','', time,'','']
                 self.df.to_csv(self.log_file, index_label=False, index=False)
                 self.ui.resultLabel.setText(self.ui.resultLabel.text()+'Logged. ')
             except Exception as err:
@@ -155,7 +161,7 @@ class Lookup(QDialog):
             
     def transferCallBack(self, signal):
         if signal=='101':
-            self.em.showMessage('CQC system handling error. Please contact COTS admin.')
+            self.em.showMessage('CQC system handling error. Please contact COTS developer.')
             self.reset()
             self.data = None
             self.release()
@@ -238,7 +244,7 @@ class Lookup(QDialog):
                     self.ui.peEdit.setText(pe)
                     self.ui.insEdit.setText(ins)
                     self.ui.transferButton.setFocus()
-                    if prp == 'True' or prp == 'TRUE':
+                    if prp == 'Y':
                         self.ui.prpBox.setChecked(True)
                         self.ui.tstBox.setChecked(True)
                 else:
@@ -260,10 +266,10 @@ class Lookup(QDialog):
             if os.path.exists(self.log_file):
                 df = pd.read_csv(self.log_file, keep_default_na=False)
                 if len(df) == 0:
-                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Ready','Checkout','Checkin Time','Checkout Time','Destination'])
+                    df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Status','Checkout','Checkin Time','Checkout Time','Destination'])
                     df.to_csv(self.log_file, index_label=False, index=False)
             else:
-                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Ready','Checkout','Checkin Time','Checkout Time','Destination'])
+                df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Status','Checkout','Checkin Time','Checkout Time','Destination'])
                 df.to_csv(self.log_file, index_label=False, index=False)
             self.df = pd.read_csv(self.log_file, keep_default_na=False)
             
@@ -330,7 +336,7 @@ class transferThread(QThread):
         self.cs = cs
         self.mode = mode
         self.cqc_info = cqc_info
-        self.tst_flag = False
+        self.tst_flag = 'N'
 
     def run(self):
         try:
@@ -344,7 +350,7 @@ class transferThread(QThread):
                 if self.mode[1]:
                     if self.cs.createEvent(cqc_num, 'CQPR', cqe, pe, 'TST', 'Send the CQC part to ATE test. The event is created by Tianjin BL Quality COTS.'):
                         self.result_signal.emit('TST created. ')
-                        self.tst_flag = True
+                        self.tst_flag = 'Y'
                     else:
                         self.result_signal.emit('TST not created.')
                 self.result_signal.emit('100')

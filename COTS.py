@@ -127,18 +127,20 @@ if __name__ == '__main__':
     if os.path.exists(log):
         pass
     else:
-        os.mkdir('log/'+datetime.today().date().isoformat())
         if lastlog != None:
             try:
                 leftover = pd.read_csv('log/'+lastlog+'/log.csv', keep_default_na=False)
-                leftover = leftover[leftover['Checkout']=='']
+                leftover = leftover[(leftover['Checkout']=='') & (leftover['Status']!='S')]
                 for i in leftover.index.to_list():
-                    leftover.loc[i,'Checkin'] = False
+                    leftover.loc[i,'Checkin'] = 'N'
+                os.mkdir(log)
                 leftover.to_csv(log+'/log.csv', index_label=False, index=False)
             except Exception as err:
                 print(err)
                 w.em.showMessage('Failed to acquire the log of yesterday. The program will exit. Please close the files in use and retry.')
                 w.close()
+        else:
+            os.mkdir(log)
 
     
     sys.exit(app.exec_())
