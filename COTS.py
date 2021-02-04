@@ -7,10 +7,10 @@ from datetime import datetime
 
 from PyQt5.QtWidgets import QApplication, QErrorMessage, QMainWindow, QMessageBox
 
-import Barcode_w
+import Shipment
 import Checkout
 import CQCSniffer
-import Jerboa
+import Manager
 import Lookup
 import Receipt
 import Report
@@ -30,56 +30,52 @@ class Mainwindow(QMainWindow):
 
     def showWindow(self):
         sender = self.sender().text()
-        if sender == 'CQC Check-in' or sender == ' CQC Transfer    ':
-            if self.logged:
-                if self.cs.checkActive():
+        if self.logged:
+            if sender == 'CQC Check-out':
+                self.hide()
+                self.myDialog = Checkout.Checkout()
+                self.myDialog.exec_()
+                self.show()
+                return
+            if self.cs.checkActive():
+                self.hide()
+                self.myDialog = self.setDiag(sender)
+                self.myDialog.exec_()
+                self.show()
+            else:
+                result = QMessageBox.question(self, 'Message', 'The session connected to CQC system is expired. Continue with offline mode?', QMessageBox.Yes | QMessageBox.No)
+                if result == QMessageBox.Yes:
                     self.hide()
-                    if sender == 'CQC Check-in':
-                        self.myDialog = Receipt.Receipt(self.cs)
-                    else:
-                        self.myDialog = Lookup.Lookup(self.cs)
+                    self.myDialog = self.setDiag(sender)
                     self.myDialog.exec_()
                     self.show()
                 else:
-                    result = QMessageBox.question(self, 'Message', 'The session connected to CQC system is expired. Continue with offline mode?', QMessageBox.Yes | QMessageBox.No)
-                    if result == QMessageBox.Yes:
-                        self.hide()
-                        if sender == 'CQC Check-in':
-                            self.myDialog = Receipt.Receipt(self.cs)
-                        else:
-                            self.myDialog = Lookup.Lookup(self.cs)
-                        self.myDialog.exec_()
-                        self.show()
-                    else:
-                        self.logged = False
-                        self.ui.userName.show()
-                        self.ui.password.show()
-                        self.ui.loginButton.show()
-                        self.ui.loginLabel.setText('WBI ID:\n\nPassword:')
-            else:
-                result = QMessageBox.question(self, 'Message', 'Not logged on CQC system. Continue with offline mode?', QMessageBox.Yes | QMessageBox.No)
-                if result == QMessageBox.Yes:
-                    self.hide()
-                    if sender == 'CQC Check-in':
-                        self.myDialog = Receipt.Receipt(self.cs)
-                    else:
-                        self.myDialog = Lookup.Lookup(self.cs)
-                    self.myDialog.exec_()
-                    self.show()
+                    self.logged = False
+                    self.ui.userName.show()
+                    self.ui.password.show()
+                    self.ui.loginButton.show()
+                    self.ui.loginLabel.setText('WBI ID:\n\nPassword:')
         else:
-            self.hide()
-            if sender == 'CQC Check-out':
-                self.myDialog = Checkout.Checkout()
-            elif sender == 'CQC WIP Report':
-                self.myDialog = Report.Report(self.cs)
-            elif sender == 'SICAT Queue':
-                self.myDialog = Jerboa.Jerboa()
-            elif sender == 'Barcode Scanner':
-                self.myDialog = Barcode_w.Barcode()
-            self.myDialog.exec_()
-            self.show()
-
-                        
+            result = QMessageBox.question(self, 'Message', 'Not logged on CQC system. Continue with offline mode?', QMessageBox.Yes | QMessageBox.No)
+            if result == QMessageBox.Yes:
+                self.hide()
+                self.myDialog = self.setDiag(sender)
+                self.myDialog.exec_()
+                self.show()
+    
+    def setDiag(self, sender):
+        if sender == 'CQC Check-out':
+            return Checkout.Checkout()
+        elif sender == 'CQC WIP Report':
+            return Report.Report(self.cs)
+        elif sender == 'Product Manager':
+            return Manager.Manager(self.cs)
+        elif sender == 'CQC on the Way':
+            return Shipment.Shipment(self.cs)
+        elif sender == 'CQC Check-in':
+            return Receipt.Receipt(self.cs)
+        elif sender == ' CQC Transfer    ':
+            return Lookup.Lookup(self.cs)
 
     def loginCQC(self):
         self.cs = CQCSniffer.CQCSniffer('https://nww.cqc.nxp.com/CQC/', self.ui.userName.text(), self.ui.password.text())

@@ -38,6 +38,9 @@ class Lookup(QDialog):
     def transfer(self):
         try:
             self.ui.resultLabel.setText('')
+            if self.ui.cqcNumEdit.text() == '':
+                self.em.showMessage('Bad CQC number.')
+                return
             if (self.ui.prpBox.isChecked() or self.ui.tstBox.isChecked()):
                 if re.match(r'^[0-9]{6}[A-Z]{1}$', self.ui.cqcNumEdit.text()):
                     cqc_num = self.ui.cqcNumEdit.text()
@@ -63,7 +66,6 @@ class Lookup(QDialog):
             else:
                 self.queue.loc[len(self.queue)] = [self.ui.cqcNumEdit.text(), self.ui.cqeEdit.text(), self.ui.peEdit.text(), self.ui.partNameEdit.text(), 'N', self.ui.insEdit.text()]
                 self.queue.drop_duplicates(['CQC#'], keep='last', ignore_index=True, inplace=True)
-                self.reset()
                 self.updateTable()
             try:
                 if self.data == None:
@@ -78,7 +80,7 @@ class Lookup(QDialog):
                     row = []
                     if cqc_num in self.df['CQC#'].values:
                         temp = self.df[self.df['CQC#']==cqc_num]
-                        temp = temp[temp['Status']!='R']
+                        temp = temp[temp['Checkout']=='']
                         if not len(temp) == 0:
                             index = temp.index.to_list()[-1]
                             for col, x in self.df.iloc[index].iteritems():
@@ -99,9 +101,9 @@ class Lookup(QDialog):
                                 row.append(x)
                             self.df.iloc[index] = row
                         else:
-                            self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name,'','','','','','','R','','','','']
+                            self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name,'','','','','','R','','','','']
                     else:
-                        self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name,'', '','', '','','','R','','','','']
+                        self.df.loc[len(self.df)] = [cqc_num, '', cqe, pe, pem, '', part_name,'','','','','','R','','','','']
                 else:
                     cqc_num, qty, code, ship, cqe, pe, pem, part_name, ins, rcv, prp, time = self.data
                     time = datetime.fromtimestamp(float(time)).strftime('%d/%m/%Y %H:%M')
@@ -109,7 +111,7 @@ class Lookup(QDialog):
                     self.data = None
                     if cqc_num in self.df['CQC#'].values:
                         temp = self.df[self.df['CQC#']==cqc_num]
-                        temp = temp[temp['Status']!='R']
+                        temp = temp[temp['Checkout']=='']
                         if not len(temp) == 0:
                             index = temp.index.to_list()[-1]
                             for col, x in self.df.iloc[index].iteritems():
@@ -152,6 +154,7 @@ class Lookup(QDialog):
                     else:
                         self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, 'N', 'R','', time,'','']
                 self.df.to_csv(self.log_file, index_label=False, index=False)
+                self.reset()
                 self.ui.resultLabel.setText(self.ui.resultLabel.text()+'Logged. ')
             except Exception as err:
                 print(err)

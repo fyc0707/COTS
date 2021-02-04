@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="icons">
+    <file>resources/img/manager.png</file>
+    <file>resources/img/Truck.png</file>
     <file>resources/img/Checkout.png</file>
     <file>resources/img/alarm.png</file>
     <file>resources/img/Barcode.png</file>

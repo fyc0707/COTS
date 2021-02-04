@@ -1,9 +1,10 @@
 PE_NAME,PE_EMAIL,MANAGER,MANAGER_EMAIL
 Vivian GUO (NXA16582),vivian.guo@nxp.com,Weihua ZHAO (NXA22322),weihua.zhao@nxp.com
-Sijia XU (NXF28220),sijia.xu@nxp.com,Nichol NING (NXA16242),nichol.ning@nxp.com;yu.wang_4@nxp.com;bo.zhou_1@nxp.com;lei.feng@nxp.com
-Huan WANG (NXA15452),huan.w@nxp.com,Nichol NING (NXA16242),nichol.ning@nxp.com;yu.wang_4@nxp.com;bo.zhou_1@nxp.com;lei.feng@nxp.com
-Yajie HAN (NXF34027),yajie.han@nxp.com,Nichol NING (NXA16242),nichol.ning@nxp.com;yu.wang_4@nxp.com;bo.zhou_1@nxp.com;lei.feng@nxp.com
-Yongchao WU (NXF50962),yongchao.wu@nxp.com,Nichol NING (NXA16242),nichol.ning@nxp.com;yu.wang_4@nxp.com;bo.zhou_1@nxp.com;lei.feng@nxp.com
+Sijia XU (NXF28220),sijia.xu@nxp.com,Nichol NING (NXA16242),nichol.ning@nxp.com;bo.zhou_1@nxp.com;lei.feng@nxp.com
+Huan WANG (NXA15452),huan.w@nxp.com,Nichol NING (NXA16242),nichol.ning@nxp.com;bo.zhou_1@nxp.com;lei.feng@nxp.com
+Yajie HAN (NXF34027),yajie.han@nxp.com,Nichol NING (NXA16242),nichol.ning@nxp.com;bo.zhou_1@nxp.com;lei.feng@nxp.com
+Yongchao WU (NXF50962),yongchao.wu@nxp.com,Nichol NING (NXA16242),nichol.ning@nxp.com;bo.zhou_1@nxp.com;lei.feng@nxp.com
+Shulong PEI (NXF63925),shulong.pei@nxp.com,Nichol NING (NXA16242),nichol.ning@nxp.com;bo.zhou_1@nxp.com;lei.feng@nxp.com
 J.j. SUN (NXA16080),jianjun.sun@nxp.com,Brian JIANG (NXA21239),brian.jiang@nxp.com;ailin.sun@nxp.com;jiwei.zheng@nxp.com
 Louis LU (NXA22978),xiaoqiang.lu@nxp.com,Brian JIANG (NXA21239),brian.jiang@nxp.com;ailin.sun@nxp.com;jiwei.zheng@nxp.com
 Z.l. DU (NXA23278),zonglun.du@nxp.com,Weihua ZHAO (NXA22322),weihua.zhao@nxp.com
@@ -28,7 +29,7 @@ Bowie CHEN (NXA12976),bowei.chen@nxp.com,Y.h. ZHANG (NXA22715),yuehui.zhang@nxp.
 Brenda WANG (NXA23007),brenda.wang@nxp.com,Brian JIANG (NXA21239),brian.jiang@nxp.com;ailin.sun@nxp.com;jiwei.zheng@nxp.com
 Jason SUN (NXA13120),haosai.sun@nxp.com,Y.h. ZHANG (NXA22715),yuehui.zhang@nxp.com;jing.wang_1@nxp.com;zibin.shi@nxp.com
 Ting HAO (NXF46403),ting.hao@nxp.com,Ray ZHU (NXA19630),rui.zhu@nxp.com
-Vincent FANG (NXA23018),xin.fang@nxp.com;zhe.zhang@nxp.com;xu.li@nxp.com;meihui.cao@nxp.com;chao.yang_2@nxp.com;zhe.sun_3@nxp.com;xiaodong.bai@nxp.com;nan.yang_2@nxp.com;kael.hong@nxp.com,Barry GAO (NXA19176),barry.gao@nxp.com
+Vincent FANG (NXA23018),xin.fang@nxp.com;zhe.zhang@nxp.com;xu.li@nxp.com;meihui.cao@nxp.com;chao.yang_2@nxp.com;zhe.sun_3@nxp.com;xiaodong.bai@nxp.com;kael.hong@nxp.com;zhihao.guan@nxp.com;chris.zhao@nxp.com,Barry GAO (NXA19176),barry.gao@nxp.com
 Bin LU (NXA12855),bin.lu@nxp.com,Jonathan JIANG (NXA22711),jonathan.jiang@nxp.com
 Wei CHEN (NXA22308),w.chen@nxp.com,James LIU (NXA21904),james.liu@nxp.com
 Irene FENG (NXA22770),yun.feng@nxp.com,Vicky LIU (NXA22720),vicky.liu@nxp.com 
@@ -76,5 +77,17 @@ X.n. LIU (NXA22801),xuena.liu@nxp.com,Double ZHANG (NXA12984),double.zhang@nxp.c
 Y.h. YUAN (NXA22635),yonghua.yuan@nxp.com,Double ZHANG (NXA12984),double.zhang@nxp.com
 Yanwei HAN (NXA21933),yanwei.han@nxp.com,C.h. LIU (NXA13691),chuanhe.liu@nxp.com
 Yang WANG (NXA21888),yang.wang_9@nxp.com,Vicky LIU (NXA22720),vicky.liu@nxp.com 
-Yue Su (NXA22725),yue.su@nxp.com,James LIU (NXA21904),james.liu@nxp.com
+Yue SU (NXA22725),yue.su@nxp.com,James LIU (NXA21904),james.liu@nxp.com
 Z.l. ZHANG (NXA06774),zhilong.zhang@nxp.com,Christ CUI (NXA22743),yujie.cui@nxp.com
+Yu PANG (NXF05200),yu.pang@nxp.com,Yun BAI (NXA22766),yun.bai@nxp.com;peiwen.xu1@nxp.com;yipeng.zhang@nxp.com
+Mike ZHANG (NXF40974),haidong.zhang@nxp.com,Y.h. ZHANG (NXA22715),yuehui.zhang@nxp.com;jing.wang_1@nxp.com;zibin.shi@nxp.com
+Robbie ZHANG (NXA16748),robbie.zhang@nxp.com,Brian JIANG (NXA21239),brian.jiang@nxp.com;ailin.sun@nxp.com;jiwei.zheng@nxp.com
+Q.f. LIU (NXA19184),qingfeng.liu@nxp.com,Helen LI (NXA08165),helen.li@nxp.com
+Leon SUN (NXF30908),liang.sun_1@nxp.com,Helen LI (NXA08165),helen.li@nxp.com
+Yan LIU (NXA21913),yan.liu21913@nxp.com,Helen LI (NXA08165),helen.li@nxp.com
+Liguang HAN (NXF40273),liguang.han@nxp.com,Helen LI (NXA08165),helen.li@nxp.com
+Liangqi ZOU (NXF41861),liangqi.zou@nxp.com,Vicky LIU (NXA22720),vicky.liu@nxp.com 
+Varshini BALASUBRAMANIAN (NXF42284),varshini.balasubramanian@nxp.com,Jitesh SATASIA (NXA16256),jitesh.satasia@nxp.com
+Allison LI (NXA19167),allison.li@nxp.com,Helen LI (NXA08165),helen.li@nxp.com
+Eric LU (NXA13511),chengyu.lu@nxp.com,Helen LI (NXA08165),helen.li@nxp.com
+Fubin YAO (NXA12272),fubin.yao@nxp.com,Graham CHU (NXA08193),graham.chu@nxp.com

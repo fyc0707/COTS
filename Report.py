@@ -83,10 +83,19 @@ class Report(QDialog):
             self.ui.resultLabel.setText('Email failed.')
             self.release()
 
+    def valueChanged(self, row, col, value):
+        try:
+            self.df.iloc[row,col] = value
+            self.df.to_csv(self.log_file, index_label=False, index=False)
+        except Exception as err:
+            print(err)
+            self.em.showMessage('The log file is being used by another process. Please close the file and retry.')
+            self.updateTable()
 
     def updateTable(self):
-        model = pandasModel(self.df)
-        self.ui.cqcList.setModel(model)
+        self.model = pandasModel(self.df)
+        self.model.value_signal.connect(self.valueChanged)
+        self.ui.cqcList.setModel(self.model)
         self.ui.cqcList.horizontalHeader().setDefaultAlignment(Qt.AlignCenter | Qt.Alignment(Qt.TextWordWrap))
         self.ui.cqcList.horizontalHeader().setFixedHeight(40)
         self.ui.cqcList.setColumnWidth(0,60)
@@ -198,6 +207,7 @@ class emailThread(QThread):
 class pandasModel(QAbstractTableModel):
     '''Model dataframe to QTableView
     '''
+    value_signal = pyqtSignal(int, int, str)
     def __init__(self, data):
         super(pandasModel, self).__init__()
         self.data = data
@@ -210,7 +220,7 @@ class pandasModel(QAbstractTableModel):
     
     def data(self, index, role=Qt.DisplayRole):
         if index.isValid():
-            if role == Qt.DisplayRole:
+            if role == Qt.DisplayRole or role == Qt.EditRole:
                 return str(self.data.iloc[index.row(), index.column()])
         return None
     
@@ -218,3 +228,22 @@ class pandasModel(QAbstractTableModel):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return self.data.columns[section]
         return None
+    
+    def setData(self, index, value, role):
+        if not index.isValid():
+            return False
+        if role != Qt.EditRole:
+            return False
+        row = index.row()
+        if row < 0 or row >= len(self.data.values):
+            return False
+        column = index.column()
+        if column < 0 or column >= self.data.columns.size:
+            return False
+        self.data.iloc[row,column] = value
+        self.dataChanged.emit(index, index)
+        self.value_signal.emit(int(row), int(column), str(value))
+        return True
+    
+    def flags(self, index):
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
