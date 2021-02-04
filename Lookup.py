@@ -413,7 +413,7 @@ class emailThread(QThread):
                     l.append(row.to_list())  
                 t.append_data_rows(l)
                 t.set_cell_style({
-                            'border-color': '#000',
+                            'border-color': '#aaaaaa',
                             'border-width': '1px',
                             'border-style': 'solid',
                             'border-collapse': 'collapse',

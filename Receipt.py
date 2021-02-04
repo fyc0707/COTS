@@ -1,7 +1,6 @@
 #coding=utf-8
 import os, subprocess, sys
 from datetime import datetime
-from io import BytesIO
 
 import qrcode as qr
 import pandas as pd
@@ -145,7 +144,7 @@ class Receipt(QDialog):
     def getCqcList(self):
         self.reset()
         fileobj = open(self.list_file+'1', 'wb')
-        self.thread = downloadThread(self.cs, fileobj, 1024)
+        self.thread = downloadThread(self.cs, fileobj, 1)
         self.thread.process_signal.connect(self.downloadCallBack)
         self.thread.start()
         self.ui.cqcListLable.setText('Downloading')

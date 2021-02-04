@@ -4,7 +4,6 @@ import re
 
 
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QDialog, QErrorMessage
 
 import Ui_shipment

@@ -767,7 +767,7 @@ QPushButton:pressed {
     <rect>
      <x>20</x>
      <y>420</y>
-     <width>321</width>
+     <width>331</width>
      <height>31</height>
     </rect>
    </property>
@@ -795,7 +795,7 @@ QPushButton:pressed {
     <rect>
      <x>20</x>
      <y>460</y>
-     <width>121</width>
+     <width>91</width>
      <height>31</height>
     </rect>
    </property>
@@ -817,39 +817,12 @@ QPushButton:pressed {
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="engEmailEdit">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>460</y>
-     <width>251</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Calibri</family>
-     <pointsize>12</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-  </widget>
   <widget class="QLabel" name="Label_9">
    <property name="geometry">
     <rect>
      <x>20</x>
      <y>500</y>
-     <width>121</width>
+     <width>91</width>
      <height>31</height>
     </rect>
    </property>
@@ -866,33 +839,6 @@ QPushButton:pressed {
    </property>
    <property name="text">
     <string>Manager</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="mgrEdit">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>500</y>
-     <width>251</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Calibri</family>
-     <pointsize>12</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
-   </property>
-   <property name="text">
-    <string/>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -952,7 +898,7 @@ QPushButton:pressed {
     <rect>
      <x>80</x>
      <y>580</y>
-     <width>281</width>
+     <width>331</width>
      <height>81</height>
     </rect>
    </property>
@@ -1001,7 +947,7 @@ QPushButton:pressed {
   <widget class="QPushButton" name="clearEngAttButton">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>420</x>
      <y>580</y>
      <width>51</width>
      <height>31</height>
@@ -1052,7 +998,7 @@ QPushButton:pressed {
     <rect>
      <x>380</x>
      <y>500</y>
-     <width>121</width>
+     <width>101</width>
      <height>31</height>
     </rect>
    </property>
@@ -1074,39 +1020,12 @@ QPushButton:pressed {
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="mgrEmailEdit">
-   <property name="geometry">
-    <rect>
-     <x>480</x>
-     <y>500</y>
-     <width>251</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Calibri</family>
-     <pointsize>12</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-  </widget>
   <widget class="QLabel" name="Label_11">
    <property name="geometry">
     <rect>
      <x>380</x>
      <y>460</y>
-     <width>121</width>
+     <width>101</width>
      <height>31</height>
     </rect>
    </property>
@@ -1357,6 +1276,90 @@ Engineer CSV</string>
     <bool>false</bool>
    </property>
   </widget>
+  <widget class="QLabel" name="engEmailLabel">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>460</y>
+     <width>241</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>12</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="mgrNameLabel">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>500</y>
+     <width>241</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>12</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="mgrEmailLabel">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>500</y>
+     <width>241</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>12</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
   <zorder>line_3</zorder>
   <zorder>line_2</zorder>
   <zorder>welcomeLabel</zorder>
@@ -1381,15 +1384,12 @@ Engineer CSV</string>
   <zorder>saveEngButton</zorder>
   <zorder>engInfoLabel</zorder>
   <zorder>Label_8</zorder>
-  <zorder>engEmailEdit</zorder>
   <zorder>Label_9</zorder>
-  <zorder>mgrEdit</zorder>
   <zorder>addEngAttButton</zorder>
   <zorder>partAttEdit_2</zorder>
   <zorder>Label_6</zorder>
   <zorder>clearEngAttButton</zorder>
   <zorder>Label_10</zorder>
-  <zorder>mgrEmailEdit</zorder>
   <zorder>Label_11</zorder>
   <zorder>partCSVButton</zorder>
   <zorder>engCSVButton</zorder>
@@ -1398,6 +1398,9 @@ Engineer CSV</string>
   <zorder>partNameEdit</zorder>
   <zorder>engineerEdit</zorder>
   <zorder>engFuncEdit</zorder>
+  <zorder>engEmailLabel</zorder>
+  <zorder>mgrNameLabel</zorder>
+  <zorder>mgrEmailLabel</zorder>
  </widget>
  <resources>
   <include location="manager_resource.qrc"/>
