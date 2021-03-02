@@ -72,6 +72,7 @@ class Ui_Dialog(object):
         self.shipperLink.setObjectName("shipperLink")
         self.shipperLink.setTextFormat(QtCore.Qt.RichText)
         self.shipperLink.setOpenExternalLinks(True)
+        self.shipperLink.setWordWrap(True)
         self.line = QtWidgets.QFrame(Dialog)
         self.line.setGeometry(QtCore.QRect(0, 60, 791, 20))
         self.line.setFrameShadow(QtWidgets.QFrame.Raised)
