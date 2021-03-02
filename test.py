@@ -1,4 +1,9 @@
+import CQCSniffer as cs
 
+core = cs.CQCSniffer('https://nww.cqc.nxp.com/CQC/', 'nxf44756','China#0202')
+core.login()
+a,b,c,d = core.getFullInfo('nxf44756')
+print([a, b, c, d])
 
 '''
 field = [

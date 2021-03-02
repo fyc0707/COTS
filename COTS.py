@@ -107,7 +107,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     w = Mainwindow()
     w.show()
-    
     history = os.listdir('log/')
     lastlog = None
     for h in history:
@@ -137,6 +136,4 @@ if __name__ == '__main__':
                 w.close()
         else:
             os.mkdir(log)
-
-    
     sys.exit(app.exec_())

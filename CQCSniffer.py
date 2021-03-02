@@ -93,8 +93,10 @@ class CQCSniffer:
 
 
     def logOut(self):
-        self.session.get(self.url+'login.do?method=logout', verify=False, headers=self.headers, timeout=700)
-
+        try:
+            self.session.get(self.url+'login.do?method=logout', verify=False, headers=self.headers, timeout=700)
+        except:
+            pass
 
     def getWIPData(self, fp):
         df = pd.read_excel(fp, header=7, keep_default_na=False).astype(str)
@@ -439,7 +441,7 @@ class CQCSniffer:
             print(err)
             return None
 
-    def getEmail(self, name):
+    def getEmail(self, name): 
         try:
             name = name.split('(')[-1].split(')')[0]
             resp = self.session.get(self.url+'login.do?method=getOtherProfile&rid='+name, verify=False, headers=self.headers)
@@ -450,4 +452,30 @@ class CQCSniffer:
         except Exception as err:
             print(err)
             return None
-        
+    
+    def getFullInfo(self, wbi):
+        name, email, mgr, mgr_email = '', '', '', ''
+        wbi = wbi.split('(')[-1].split(')')[0].upper()
+        try:
+            resp = self.session.get(self.url+'login.do?method=getOtherProfile&rid='+wbi, verify=False, headers=self.headers).text
+            soup = BeautifulSoup(resp, 'html5lib')
+            name = soup.find('b', text='Name').parent.next_sibling.next_sibling.text
+            name = name + ' (' + wbi + ')'
+        except Exception as err:
+            print('Failed to get name' + err)
+
+        try:
+            email = soup.find('b', text='Department').parent.parent.previous_sibling.previous_sibling.a.next_element
+        except Exception as err:
+            print('Failed to get email' + err)
+
+        try:
+            mgr = soup.find('b', text='Supervisor').parent.next_sibling.next_sibling.a.text[1:-1]
+            mgr_email = soup.find('b', text='Supervisor').parent.next_sibling.next_sibling.a.attrs['href']
+            resp = self.session.get(self.url+mgr_email, verify=False, headers=self.headers).text
+            soup = BeautifulSoup(resp, 'html5lib')
+            mgr_email = soup.find('b', text='Department').parent.parent.previous_sibling.previous_sibling.a.next_element
+        except Exception as err:
+            print('Failed to get mgr' + err)
+
+        return name, email, mgr, mgr_email

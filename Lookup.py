@@ -23,8 +23,10 @@ class Lookup(QDialog):
         if not self.cs.activeFlag:
             self.ui.prpBox.setCheckable(False)
             self.ui.tstBox.setCheckable(False)
+            self.ui.iceBox.setCheckable(False)
         self.ui.prpBox.setChecked(False)
         self.ui.tstBox.setChecked(False)
+        self.ui.iceBox.setChecked(False)
         self.em = QErrorMessage(self)
         self.em.setWindowTitle('Error')
         self.ui.welcomeLabel.setText('Welcome, ' + self.cs.user_name)
@@ -41,7 +43,7 @@ class Lookup(QDialog):
             if self.ui.cqcNumEdit.text() == '':
                 self.em.showMessage('Bad CQC number.')
                 return
-            if (self.ui.prpBox.isChecked() or self.ui.tstBox.isChecked()):
+            if (self.ui.prpBox.isChecked() or self.ui.tstBox.isChecked() or self.ui.iceBox.isChecked()):
                 if re.match(r'^[0-9]{6}[A-Z]{1}$', self.ui.cqcNumEdit.text()):
                     cqc_num = self.ui.cqcNumEdit.text()
                 else:
@@ -56,7 +58,7 @@ class Lookup(QDialog):
                 ins = self.ui.insEdit.text()
                 tst_flag = False
                 cqc_info = [cqc_num, cqe, pe, product]
-                mode = [self.ui.prpBox.isChecked(), self.ui.tstBox.isChecked()]
+                mode = [self.ui.prpBox.isChecked(), self.ui.tstBox.isChecked(), self.ui.iceBox.isChecked()]
                 self.queue.loc[len(self.queue)] = [cqc_num, cqe, pe, product, 'N', ins]
                 self.queue.drop_duplicates(['CQC#'], keep='last', ignore_index=True, inplace=True)
                 self.thread = transferThread(self.cs, mode, cqc_info)
@@ -71,8 +73,8 @@ class Lookup(QDialog):
                 if self.data == None:
                     cqc_num = self.ui.cqcNumEdit.text()
                     pe = self.ui.peEdit.text()
-                    if pe in self.peTable['PE_NAME'].values:
-                        pem = self.peTable[self.peTable['PE_NAME']==pe]['MANAGER'].iloc[0]
+                    if pe in self.engTable['NAME'].values:
+                        pem = self.engTable[self.engTable['NAME']==pe]['MANAGER'].iloc[0]
                     else:
                         pem = ''
                     part_name = self.ui.partNameEdit.text()
@@ -206,7 +208,7 @@ class Lookup(QDialog):
         if len(self.queue)==0:
             self.em.showMessage('The queue is empty.')
             return
-        self.thread = emailThread(self.cs, self.queue, self.cqeTable, self.peTable)
+        self.thread = emailThread(self.cs, self.queue, self.engTable)
         self.thread.result_signal.connect(self.emailCallBack)
         self.thread.start()
         self.busy()
@@ -221,6 +223,15 @@ class Lookup(QDialog):
             pythoncom.CoUninitialize()
             self.release()
 
+    @pyqtSlot()
+    def on_iceBox_clicked(self):
+        if self.ui.tstBox.isChecked():
+            self.ui.tstBox.setChecked(False)
+    
+    @pyqtSlot()
+    def on_tstBox_clicked(self):
+        if self.ui.iceBox.isChecked():
+            self.ui.iceBox.setChecked(False)
 
     @pyqtSlot()
     def on_clearButton_clicked(self):
@@ -290,25 +301,19 @@ class Lookup(QDialog):
             self.em.showMessage('Failed to load the product table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.peTable = pd.read_csv('tables/PETable.csv', keep_default_na=False)
-            completer = QCompleter(self.peTable['PE_NAME'].values.tolist())
+            self.engTable = pd.read_csv('tables/EmployeeTable.csv', keep_default_na=False)
+            completer = QCompleter(self.engTable[self.engTable['FUNCTION'].str.contains('PE|TECHNICIAN')]['NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
             self.ui.peEdit.setCompleter(completer)
-        except Exception as err:
-            self.em.showMessage('Failed to load the PE table. Please close the file in use and restart the window.')
-            print(err)
-        try:
-            self.cqeTable = pd.read_csv('tables/CQETable.csv', keep_default_na=False)
-            completer = QCompleter(self.cqeTable['CQE_NAME'].values.tolist())
+            completer = QCompleter(self.engTable[self.engTable['FUNCTION']=='CQE']['NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
             self.ui.cqeEdit.setCompleter(completer)
-        except Exception as err:
-            self.em.showMessage('Failed to load the CQE table. Please close the file in use and restart the window.')
-            print(err)
-        
 
+        except Exception as err:
+            self.em.showMessage('Failed to load the employee table. Please close the file in use and restart the window.')
+            print(err)
 
     def reset(self):
         self.ui.cqcNumEdit.clear()
@@ -318,6 +323,7 @@ class Lookup(QDialog):
         self.ui.insEdit.clear()
         self.ui.tstBox.setChecked(False)
         self.ui.prpBox.setChecked(False)
+        self.ui.iceBox.setChecked(False)
         self.ui.cqcNumEdit.setFocus()
 
     def busy(self):
@@ -356,8 +362,13 @@ class transferThread(QThread):
                         self.tst_flag = 'Y'
                     else:
                         self.result_signal.emit('TST not created.')
+                if self.mode[2]:
+                    if self.cs.createEvent(cqc_num, 'CQPR', cqe, pe, 'ICE', 'Send the CQC part to EVB verification. The event is created by Tianjin BL Quality COTS.'):
+                        self.result_signal.emit('ICE created. ')
+                        self.tst_flag = 'ICE'
+                    else:
+                        self.result_signal.emit('ICE not created.')
                 self.result_signal.emit('100')
-                
             else:
                 self.result_signal.emit('103')
         except Exception as err:
@@ -367,11 +378,10 @@ class transferThread(QThread):
 
 class emailThread(QThread):
     result_signal = pyqtSignal(str)
-    def __init__(self, cs: CQCSniffer.CQCSniffer, queue, cqeTable, peTable):
+    def __init__(self, cs: CQCSniffer.CQCSniffer, queue, engTable):
         super(emailThread, self).__init__()
         self.queue = queue
-        self.cqeTable = cqeTable
-        self.peTable = peTable
+        self.engTable = engTable
         self.cs = cs
     def run(self):
         try:
@@ -381,27 +391,60 @@ class emailThread(QThread):
             mail = obj.CreateItem(0)
             mail.Subject = 'CQCs Prepared for Collection '+date
             to_list = []
-            cc_list = ['helen.zhu@nxp.com;ricky.li@nxp.com;wayne.li@nxp.com;shuyuan.chai@nxp.com;xuejie.zhang@nxp.com;zhang.rui@nxp.com;yan.mu@nxp.com','z.wang@nxp.com','van.fan@nxp.com','zhi.zhao@nxp.com']
+            cc_list = ['helen.zhu@nxp.com','ricky.li@nxp.com','wayne.li@nxp.com','shuyuan.chai@nxp.com','xuejie.zhang@nxp.com','zhang.rui@nxp.com','yan.mu@nxp.com','z.wang@nxp.com','van.fan@nxp.com','zhi.zhao@nxp.com']
             for i, row in self.queue.iterrows():
-                if row['PE'] in self.peTable['PE_NAME'].values:
-                    email = self.peTable[self.peTable['PE_NAME']==row['PE']]['PE_EMAIL'].iloc[0]
+                if row['PE'] in self.engTable['NAME'].values:
+                    r = self.engTable[self.engTable['NAME']==row['PE']].iloc[0]
+                    email = r['EMAIL']
                     if email not in to_list:
                         to_list.append(email)
-                    email = self.peTable[self.peTable['PE_NAME']==row['PE']]['MANAGER_EMAIL'].iloc[0]
-                    if email not in to_list:
-                        to_list.append(email)
-                else:
-                    email = self.cs.getEmail(row['PE'])
-                    if email != None and (email not in to_list):
-                        to_list.append(email)
-                if row['CQE'] in self.cqeTable['CQE_NAME'].values:
-                    email = self.cqeTable[self.cqeTable['CQE_NAME']==row['CQE']]['CQE_EMAIL'].iloc[0]
+                    email = r['MANAGER_EMAIL']
                     if email not in cc_list:
                         cc_list.append(email)
+                    atts = r['ATTENTION_NAME']
+                    for att in atts.split(';'):
+                        if att != '':
+                            email = self.engTable[self.engTable['NAME']==att]['EMAIL'].iloc[0]
+                            if email not in to_list:
+                                to_list.append(email)
                 else:
-                    email = self.cs.getEmail(row['CQE'])
-                    if email != None and (email not in cc_list):
+                    name, email, mgr, mgr_email = self.cs.getFullInfo(row['PE'])
+                    if email != '' and (email not in to_list):
+                        to_list.append(email)
+                    if mgr_email != '' and (mgr_email not in cc_list):
+                        cc_list.append(mgr_email)
+                    if name != '' and email != '' and mgr != '' and mgr_email != '':
+                        try:
+                            self.engTable.loc[len(self.engTable)] = [name, email, 'PE', mgr, mgr_email, '']
+                            self.engTable.to_csv('tables/EmployeeTable.csv', index_label=False, index=False)
+                        except Exception as err:
+                            print(err)
+                if row['CQE'] in self.engTable['NAME'].values:
+                    r = self.engTable[self.engTable['NAME']==row['CQE']].iloc[0]
+                    email = r['EMAIL']
+                    if email not in to_list:
+                        to_list.append(email)
+                    email = r['MANAGER_EMAIL']
+                    if email not in cc_list:
                         cc_list.append(email)
+                    atts = r['ATTENTION_NAME']
+                    for att in atts.split(';'):
+                        if att != '':
+                            email = self.engTable[self.engTable['NAME']==att]['EMAIL'].iloc[0]
+                            if email not in to_list:
+                                to_list.append(email)
+                else:
+                    name, email, mgr, mgr_email = self.cs.getFullInfo(row['CQE'])
+                    if email != '' and (email not in to_list):
+                        to_list.append(email)
+                    if mgr_email != '' and (mgr_email not in cc_list):
+                        cc_list.append(mgr_email)
+                    if name != '' and email != '' and mgr != '' and mgr_email != '':
+                        try:
+                            self.engTable.loc[len(self.engTable)] = [name, email, 'CQE', mgr, mgr_email, '']
+                            self.engTable.to_csv('tables/EmployeeTable.csv', index_label=False, index=False)
+                        except Exception as err:
+                            print(err)
             mail.To = ';'.join(to_list)
             mail.CC = ';'.join(cc_list)
             def to_html(table: pd.DataFrame):

@@ -36,7 +36,6 @@ class Receipt(QDialog):
         self.checkFile()
         
     def fillInfo(self):
-        
         if self.ui.cqcNumEdit.text()=='':
             self.em.showMessage('Please input CQC number.')
             self.reset()
@@ -96,7 +95,6 @@ class Receipt(QDialog):
             self.release()
             self.thread.exit()
 
-
     def itemSelected(self):
         self.reset()
         row = self.ui.cqcList.selectedIndexes()[0].row()
@@ -150,7 +148,6 @@ class Receipt(QDialog):
         self.ui.cqcListLable.setText('Downloading')
         self.busy()
         
-
     def downloadCallBack(self, signal):
         if signal == 101:
             self.release()
@@ -189,22 +186,20 @@ class Receipt(QDialog):
         try:
             pe = self.ui.peEdit.text()
             pem = ''
-            if pe in self.peTable['PE_NAME'].values:
-                pem = self.peTable[self.peTable['PE_NAME']==pe]['MANAGER'].iloc[0]            
+            if pe in self.engTable['NAME'].values:
+                pem = self.engTable[self.engTable['NAME']==pe]['MANAGER'].iloc[0]
             event = 'RCT' if 'RCT' in self.rcv_df[self.rcv_df['CQC#']==self.ui.cqcNumEdit.text()]['Event'].iloc[0] else 'RCV'
             cqc_type = self.rcv_df[self.rcv_df['CQC#']==self.ui.cqcNumEdit.text()]['Type'].iloc[0]
             b2b = self.rcv_df[self.rcv_df['CQC#']==self.ui.cqcNumEdit.text()]['B2B'].iloc[0]
-            
         except:
             event = ''
             cqc_type = ''
             self.ui.rcvBox.setChecked(False)
             self.ui.prpBox.setChecked(False)
-        
         mode = [self.ui.checkOnlyBox.isChecked(), self.ui.printBox.isChecked(), self.ui.prpBox.isChecked(), self.ui.rcvBox.isChecked()]
         if mode == [False]*4:
             self.em.showMessage('Please check options.')
-        else:           
+        else:
             cqc_info = [self.ui.cqcNumEdit.text(), self.ui.partNameEdit.text(), self.ui.qtyEdit.text(), self.ui.traceCodeEdit.text(), self.ui.shipEdit.text(),
                 self.ui.cqeEdit.text(), pe, pem, self.ui.instruEdit.text(), event, cqc_type, b2b]
             
@@ -213,8 +208,7 @@ class Receipt(QDialog):
             self.thread.status_signal.connect(self.checkinCallBack)
             self.thread.start()
             self.busy()
-            
-    
+                
     def checkinCallBack(self, signal):
         if type(signal)==str:
             if signal=='Check-in Success':
@@ -236,7 +230,6 @@ class Receipt(QDialog):
                 self.release()
             else:
                 self.ui.progressBar.setValue(signal)
-
 
     def checkFile(self):
         self.rcv_df = None
@@ -264,7 +257,7 @@ class Receipt(QDialog):
                 self.rcv_df = None
             if not os.path.exists(self.log_file):
                 df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Status','Checkout','Checkin Time','Checkout Time','Destination'])
-                df.to_csv(self.log_file, index_label=False)
+                df.to_csv(self.log_file, index_label=False, index=False)
             else:
                 df = pd.read_csv(self.log_file)
                 if len(df) == 0:
@@ -282,24 +275,18 @@ class Receipt(QDialog):
             self.em.showMessage('Failed to load the product table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.peTable = pd.read_csv('tables/PETable.csv', keep_default_na=False)
-            completer = QCompleter(self.peTable['PE_NAME'].values.tolist())
+            self.engTable = pd.read_csv('tables/EmployeeTable.csv', keep_default_na=False)
+            completer = QCompleter(self.engTable[self.engTable['FUNCTION'].str.contains('PE|TECHNICIAN')]['NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
             self.ui.peEdit.setCompleter(completer)
-        except Exception as err:
-            self.em.showMessage('Failed to load the PE table. Please close the file in use and restart the window.')
-            print(err)
-        try:
-            self.cqeTable = pd.read_csv('tables/CQETable.csv', keep_default_na=False)
-            completer = QCompleter(self.cqeTable['CQE_NAME'].values.tolist())
+            completer = QCompleter(self.engTable[self.engTable['FUNCTION']=='CQE']['NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
             self.ui.cqeEdit.setCompleter(completer)
         except Exception as err:
-            self.em.showMessage('Failed to load the CQE table. Please close the file in use and restart the window.')
-            print(err)
-        
+            self.em.showMessage('Failed to load the employee table. Please close the file in use and restart the window.')
+            print(err)        
 
     def reset(self):
         '''Reset the panel
@@ -341,16 +328,17 @@ class Receipt(QDialog):
     def on_rcvBox_clicked(self):
         if self.ui.rcvBox.isChecked():
             self.ui.checkOnlyBox.setChecked(False)
+
     @pyqtSlot()
     def on_prpBox_clicked(self):
         if self.ui.prpBox.isChecked():
             self.ui.checkOnlyBox.setChecked(False)
+    
     @pyqtSlot()
     def on_checkOnlyBox_clicked(self):
         if self.ui.checkOnlyBox.isChecked():
             self.ui.rcvBox.setChecked(False)
             self.ui.prpBox.setChecked(False)
-
 
     def closeEvent(self, event):
         result = QMessageBox.question(self, "Message", "Confirm to exit. The unsubmitted job will be lost.", QMessageBox.Yes | QMessageBox.No)
@@ -358,8 +346,6 @@ class Receipt(QDialog):
             event.accept()
         else:
             event.ignore()
-
-
 
 
 class pandasModel(QAbstractTableModel):
@@ -385,7 +371,7 @@ class pandasModel(QAbstractTableModel):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return self.data.columns[section]
         return None
-    
+
 
 class downloadThread(QThread):
     '''RCV file download thread
@@ -420,7 +406,7 @@ class downloadThread(QThread):
         except:
             self.process_signal.emit(101)
         self.fileobj.close()
-        self.exit(0)         
+        self.exit(0)
 
 
 class checkinThread(QThread):
@@ -444,15 +430,13 @@ class checkinThread(QThread):
             taskqty = 1 + self.mode.count(True)
             results = ['N']*3
             success = True
-            time = datetime.now()     
-        
+            time = datetime.now()
             if self.mode[3] or self.mode[2]:
                 if self.cs.checkActive():
                     if self.mode[3]:
                         if event == 'RCT':
                             if self.cs.closeEvent(cqc_num, cqc_type, cqe, 'RCT', 'The CQC sample is received. The event is closed by Tianjin BL Quality COTS.'):
                                 self.status_signal.emit('RCT closed. ')
-                                
                                 results[2] = 'Y'
                             else:
                                 self.status_signal.emit('RCT not closed. ')
@@ -480,11 +464,9 @@ class checkinThread(QThread):
                             success = False
                         progress = progress + 1
                         self.progress_signal.emit(int((progress)*100/taskqty))
-
                 else:
                     success = False
                     self.progress_signal.emit(103)
-                
             if self.mode[1]:
                 if self.printLabel(cqc_num, qty, code, ship, cqe, pe, pem, part_name, ins, results[2], results[1], time):
                     self.status_signal.emit('Label printed. ')
@@ -495,7 +477,6 @@ class checkinThread(QThread):
                     success = False   
                 progress = progress + 1
                 self.progress_signal.emit(int((progress)*100/taskqty))
-
         except Exception as err:
             print(err)
             self.progress_signal.emit(101)
@@ -509,7 +490,6 @@ class checkinThread(QThread):
                 self.log.loc[len(self.log)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship,
                                                 results[2], results[1], 'Y','P', 
                                                 '', time.strftime('%d/%m/%Y %H:%M'), '','']
-            
             self.log.to_csv(self.log_file, index_label=False, index=False)
             self.progress_signal.emit(102)
             if success:
@@ -553,7 +533,7 @@ class checkinThread(QThread):
                 '-dDEVICEHEIGHTPOINTS=113 ' \
                 '-sOutputFile="%printer%Deli DL-886A" ' \
                 '"log/label.pdf"'
-            #subprocess.call(args, shell=True)
+            subprocess.call(args, shell=True)
             os.remove('log/label.pdf')
             return True
         except Exception as err:
@@ -562,7 +542,9 @@ class checkinThread(QThread):
 
 
 class fillInfoThread(QThread):
+
     result_signal = pyqtSignal(int)
+
     def __init__(self, cs: CQCSniffer.CQCSniffer, cqc_num):
         super(fillInfoThread, self).__init__()
         self.cs = cs

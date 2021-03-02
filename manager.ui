@@ -386,7 +386,7 @@ QPushButton:pressed {
    <property name="font">
     <font>
      <family>Calibri</family>
-     <pointsize>10</pointsize>
+     <pointsize>12</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -627,13 +627,13 @@ QPushButton:pressed {
      <x>210</x>
      <y>240</y>
      <width>51</width>
-     <height>31</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="font">
     <font>
      <family>Calibri</family>
-     <pointsize>10</pointsize>
+     <pointsize>12</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -856,7 +856,7 @@ QPushButton:pressed {
    <property name="font">
     <font>
      <family>Calibri</family>
-     <pointsize>10</pointsize>
+     <pointsize>12</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -893,7 +893,7 @@ QPushButton:pressed {
     <string>+</string>
    </property>
   </widget>
-  <widget class="QPlainTextEdit" name="partAttEdit_2">
+  <widget class="QPlainTextEdit" name="engAttEdit">
    <property name="geometry">
     <rect>
      <x>80</x>
@@ -1144,7 +1144,7 @@ QPushButton:pressed {
    </property>
    <property name="text">
     <string>Open
-Engineer CSV</string>
+ Eng CSV</string>
    </property>
   </widget>
   <widget class="QLabel" name="respResultLabel">
@@ -1213,7 +1213,7 @@ Engineer CSV</string>
    <property name="font">
     <font>
      <family>Calibri</family>
-     <pointsize>14</pointsize>
+     <pointsize>12</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -1257,14 +1257,14 @@ Engineer CSV</string>
     <rect>
      <x>480</x>
      <y>460</y>
-     <width>91</width>
+     <width>131</width>
      <height>31</height>
     </rect>
    </property>
    <property name="font">
     <font>
      <family>Calibri</family>
-     <pointsize>14</pointsize>
+     <pointsize>12</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -1360,6 +1360,106 @@ Engineer CSV</string>
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
+  <widget class="QPushButton" name="updateAllButton">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>580</y>
+     <width>81</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::ClickFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    color: #333;
+    border: 1px solid #555;
+    border-radius: 10px;
+    border-style: outset;
+	
+	background-color: rgb(227, 227, 227);
+    }
+
+QPushButton:hover {
+    background: qradialgradient(
+        cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4,
+        radius: 1.35, stop: 0 #fff, stop: 1 #bbb
+        );
+    }
+
+QPushButton:pressed {
+    border-style: inset;
+    background: qradialgradient(
+        cx: 0.4, cy: -0.1, fx: 0.4, fy: -0.1,
+        radius: 1.35, stop: 0 #fff, stop: 1 #ddd
+        );
+    }</string>
+   </property>
+   <property name="text">
+    <string>Update All 
+ Eng Info</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="updateButton">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>540</y>
+     <width>81</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>9</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::ClickFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    color: #333;
+    border: 1px solid #555;
+    border-radius: 10px;
+    border-style: outset;
+	
+	background-color: rgb(227, 227, 227);
+    }
+
+QPushButton:hover {
+    background: qradialgradient(
+        cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4,
+        radius: 1.35, stop: 0 #fff, stop: 1 #bbb
+        );
+    }
+
+QPushButton:pressed {
+    border-style: inset;
+    background: qradialgradient(
+        cx: 0.4, cy: -0.1, fx: 0.4, fy: -0.1,
+        radius: 1.35, stop: 0 #fff, stop: 1 #ddd
+        );
+    }</string>
+   </property>
+   <property name="text">
+    <string>Get Update</string>
+   </property>
+  </widget>
+  <zorder>updateAllButton</zorder>
   <zorder>line_3</zorder>
   <zorder>line_2</zorder>
   <zorder>welcomeLabel</zorder>
@@ -1386,7 +1486,7 @@ Engineer CSV</string>
   <zorder>Label_8</zorder>
   <zorder>Label_9</zorder>
   <zorder>addEngAttButton</zorder>
-  <zorder>partAttEdit_2</zorder>
+  <zorder>engAttEdit</zorder>
   <zorder>Label_6</zorder>
   <zorder>clearEngAttButton</zorder>
   <zorder>Label_10</zorder>
@@ -1401,6 +1501,7 @@ Engineer CSV</string>
   <zorder>engEmailLabel</zorder>
   <zorder>mgrNameLabel</zorder>
   <zorder>mgrEmailLabel</zorder>
+  <zorder>updateButton</zorder>
  </widget>
  <resources>
   <include location="manager_resource.qrc"/>
@@ -1445,7 +1546,7 @@ Engineer CSV</string>
    <slot>openCSV()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>101</x>
+     <x>90</x>
      <y>323</y>
     </hint>
     <hint type="destinationlabel">
@@ -1461,7 +1562,7 @@ Engineer CSV</string>
    <slot>openCSV()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>241</x>
+     <x>180</x>
      <y>313</y>
     </hint>
     <hint type="destinationlabel">
@@ -1535,22 +1636,6 @@ Engineer CSV</string>
    </hints>
   </connection>
   <connection>
-   <sender>clearEngAttButton</sender>
-   <signal>clicked()</signal>
-   <receiver>Dialog</receiver>
-   <slot>clearEdit()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>396</x>
-     <y>597</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>470</x>
-     <y>595</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>saveEngButton</sender>
    <signal>clicked()</signal>
    <receiver>Dialog</receiver>
@@ -1614,6 +1699,102 @@ Engineer CSV</string>
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>partNameEdit</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>Dialog</receiver>
+   <slot>indexChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>245</x>
+     <y>131</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>262</x>
+     <y>186</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>engineerEdit</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>Dialog</receiver>
+   <slot>indexChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>211</x>
+     <y>211</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>267</x>
+     <y>235</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>engFuncEdit</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>Dialog</receiver>
+   <slot>indexChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>583</x>
+     <y>473</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>643</x>
+     <y>471</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>updateAllButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>updateAllEng()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>736</x>
+     <y>617</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>268</x>
+     <y>358</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>clearEngAttButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>clearEdit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>396</x>
+     <y>597</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>595</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>updateButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>updateEng()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>716</x>
+     <y>555</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>659</x>
+     <y>554</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>engineerSearch()</slot>
@@ -1625,5 +1806,9 @@ Engineer CSV</string>
   <slot>assignPE()</slot>
   <slot>addPartAttention()</slot>
   <slot>addEngAttention()</slot>
+  <slot>delEng()</slot>
+  <slot>indexChanged()</slot>
+  <slot>updateAllEng()</slot>
+  <slot>updateEng()</slot>
  </slots>
 </ui>

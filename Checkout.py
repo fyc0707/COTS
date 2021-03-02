@@ -19,8 +19,7 @@ class Checkout(QDialog):
         self.checkFile()
         self.ui.destEdit.addItems(['PE', 'FA Lab', 'Ship out', 'Others'])
         self.ui.cqcNumEdit.setFocus()
-        self.data = None
-        
+        self.data = None        
 
     def checkOut(self):
         if self.ui.cqcNumEdit.text() == '':
@@ -29,14 +28,13 @@ class Checkout(QDialog):
         if self.ui.destEdit.currentText() == '':
             self.em.showMessage('Please specify destination.')
             return
-        
         try:
             checkout_time = datetime.now()
             if self.data == None:
                 cqc_num = self.ui.cqcNumEdit.text()
                 pe = self.ui.peEdit.text()
-                if pe in self.peTable['PE_NAME'].values:
-                    pem = self.peTable[self.peTable['PE_NAME']==pe]['MANAGER'].iloc[0]
+                if pe in self.engTable['NAME'].values:
+                    pem = self.engTable[self.engTable['NAME']==pe]['MANAGER'].iloc[0]
                 else:
                     pem = ''
                 part_name = self.ui.partNameEdit.text()
@@ -66,8 +64,7 @@ class Checkout(QDialog):
                                     x = dest
                             else:
                                     if col == 'Status':
-                                        x = 'R'
-                                
+                                        x = 'R'                                
                             row.append(x)
                         self.df.iloc[index] = row
                     else:
@@ -121,21 +118,16 @@ class Checkout(QDialog):
                                     x = dest
                             else:
                                     if col == 'Status':
-                                        x = 'R'
-                                
+                                        x = 'R'                               
                             row.append(x)
-                        
                         self.df.iloc[index] = row
                     else:
                         self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, 'Y', 'R', 'Y', time, checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
                 else:
                     self.df.loc[len(self.df)] = [cqc_num, qty, cqe, pe, pem, ins, part_name, code, ship, rcv, prp, 'N', 'R', 'Y', time, checkout_time.strftime('%d/%m/%Y %H:%M'), dest]
-
-
             self.df.to_csv(self.log_file, index_label=False, index=False)
             self.reset()
             self.ui.resultLabel.setText(cqc_num+' checked out.')
-        
         except Exception as err:
             print(err)
             self.reset()
@@ -180,12 +172,10 @@ class Checkout(QDialog):
                 if len(df) == 0:
                     df = pd.DataFrame(columns=['CQC#','Qty','CQE','PE','PE Manager','Instruction','Product','Trace Code','Ship Ref.','RCV','PRP','Checkin','Status','Checkout','Checkin Time','Checkout Time','Destination'])
                     df.to_csv(self.log_file, index_label=False, index=False)
-            
             self.df = pd.read_csv(self.log_file, keep_default_na=False)
         except Exception as err:
             self.em.showMessage('The log file is being used by another process. Please close the file and retry. Please also delete the log.csv file if empty.')
             print(err)
-
         try:
             self.productTable = pd.read_csv('tables/ProductTable.csv', keep_default_na=False)
             completer = QCompleter(self.productTable['PART_TYPE_NAME'].values.tolist())
@@ -196,24 +186,18 @@ class Checkout(QDialog):
             self.em.showMessage('Failed to load the product table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.peTable = pd.read_csv('tables/PETable.csv', keep_default_na=False)
-            completer = QCompleter(self.peTable['PE_NAME'].values.tolist())
+            self.engTable = pd.read_csv('tables/EmployeeTable.csv', keep_default_na=False)
+            completer = QCompleter(self.engTable[self.engTable['FUNCTION'].str.contains('PE|TECHNICIAN')]['NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
             self.ui.peEdit.setCompleter(completer)
-        except Exception as err:
-            self.em.showMessage('Failed to load the PE table. Please close the file in use and restart the window.')
-            print(err)
-        try:
-            self.cqeTable = pd.read_csv('tables/CQETable.csv', keep_default_na=False)
-            completer = QCompleter(self.cqeTable['CQE_NAME'].values.tolist())
+            completer = QCompleter(self.engTable[self.engTable['FUNCTION']=='CQE']['NAME'].values.tolist())
             completer.setFilterMode(Qt.MatchContains)
             completer.setCaseSensitivity(Qt.CaseInsensitive)
             self.ui.cqeEdit.setCompleter(completer)
         except Exception as err:
-            self.em.showMessage('Failed to load the CQE table. Please close the file in use and restart the window.')
+            self.em.showMessage('Failed to load the employee table. Please close the file in use and restart the window.')
             print(err)
-        
 
     def destSelected(self):
         index = self.ui.destEdit.currentIndex()

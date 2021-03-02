@@ -56,21 +56,16 @@ class Report(QDialog):
             self.em.showMessage('Failed to load the product table. Please close the file in use and restart the window.')
             print(err)
         try:
-            self.peTable = pd.read_csv('tables/PETable.csv', keep_default_na=False)
+            self.engTable = pd.read_csv('tables/EmployeeTable.csv', keep_default_na=False)
         except Exception as err:
-            self.em.showMessage('Failed to load the PE table. Please close the file in use and restart the window.')
+            self.em.showMessage('Failed to load the employee table. Please close the file in use and restart the window.')
             print(err)
-        try:
-            self.cqeTable = pd.read_csv('tables/CQETable.csv', keep_default_na=False)
-        except Exception as err:
-            self.em.showMessage('Failed to load the CQE table. Please close the file in use and restart the window.')
-            print(err)
-
+        
     def email(self):
         if len(self.df)==0:
             self.em.showMessage('The list is empty.')
             return
-        self.thread = emailThread(self.cs, self.df, self.cqeTable, self.peTable)
+        self.thread = emailThread(self.cs, self.df, self.engTable)
         self.thread.result_signal.connect(self.emailCallBack)
         self.thread.start()
         self.busy()
@@ -126,14 +121,12 @@ class Report(QDialog):
         self.ui.openButton.setEnabled(True)
         self.ui.refreshButton.setEnabled(True)
 
-
 class emailThread(QThread):
     result_signal = pyqtSignal(str)
-    def __init__(self, cs: CQCSniffer.CQCSniffer, df, cqeTable, peTable):
+    def __init__(self, cs: CQCSniffer.CQCSniffer, df, engTable):
         super(emailThread, self).__init__()
         self.df = df
-        self.cqeTable = cqeTable
-        self.peTable = peTable
+        self.engTable = engTable
         self.cs = cs
 
     def run(self):
@@ -144,30 +137,62 @@ class emailThread(QThread):
             mail = obj.CreateItem(0)
             mail.Subject = 'Report of Received CQCs '+date
             to_list = []
-            cc_list = ['helen.zhu@nxp.com;ricky.li@nxp.com;wayne.li@nxp.com;shuyuan.chai@nxp.com;xuejie.zhang@nxp.com;zhang.rui@nxp.com;yan.mu@nxp.com','z.wang@nxp.com','van.fan@nxp.com','zhi.zhao@nxp.com']
+            cc_list = ['helen.zhu@nxp.com','ricky.li@nxp.com','wayne.li@nxp.com','shuyuan.chai@nxp.com','xuejie.zhang@nxp.com','zhang.rui@nxp.com','yan.mu@nxp.com','z.wang@nxp.com','van.fan@nxp.com','zhi.zhao@nxp.com']
             for i, row in self.df.iterrows():
-                if row['PE'] in self.peTable['PE_NAME'].values:
-                    email = self.peTable[self.peTable['PE_NAME']==row['PE']]['PE_EMAIL'].iloc[0]
+                if row['PE'] in self.engTable['NAME'].values:
+                    r = self.engTable[self.engTable['NAME']==row['PE']].iloc[0]
+                    email = r['EMAIL']
                     if email not in to_list:
                         to_list.append(email)
-                    email = self.peTable[self.peTable['PE_NAME']==row['PE']]['MANAGER_EMAIL'].iloc[0]
-                    if email not in to_list:
-                        to_list.append(email)
+                    email = r['MANAGER_EMAIL']
+                    if email not in cc_list:
+                        cc_list.append(email)
+                    atts = r['ATTENTION_NAME']
+                    for att in atts.split(';'):
+                        if att != '':
+                            email = self.engTable[self.engTable['NAME']==att]['EMAIL'].iloc[0]
+                            if email not in to_list:
+                                to_list.append(email)
                 else:
-                    email = self.cs.getEmail(row['PE'])
-                    if email != None and (email not in to_list):
+                    name, email, mgr, mgr_email = self.cs.getFullInfo(row['PE'])
+                    if email != '' and (email not in to_list):
                         to_list.append(email)
-                if row['CQE'] in self.cqeTable['CQE_NAME'].values:
-                    email = self.cqeTable[self.cqeTable['CQE_NAME']==row['CQE']]['CQE_EMAIL'].iloc[0]
+                    if mgr_email != '' and (mgr_email not in cc_list):
+                        cc_list.append(mgr_email)
+                    if name != '' and email != '' and mgr != '' and mgr_email != '':
+                        try:
+                            self.engTable.loc[len(self.engTable)] = [name, email, 'PE', mgr, mgr_email, '']
+                            self.engTable.to_csv('tables/EmployeeTable.csv', index_label=False, index=False)
+                        except Exception as err:
+                            print(err)
+                if row['CQE'] in self.engTable['NAME'].values:
+                    r = self.engTable[self.engTable['NAME']==row['CQE']].iloc[0]
+                    email = r['EMAIL']
                     if email not in to_list:
                         to_list.append(email)
+                    email = r['MANAGER_EMAIL']
+                    if email not in cc_list:
+                        cc_list.append(email)
+                    atts = r['ATTENTION_NAME']
+                    for att in atts.split(';'):
+                        if att != '':
+                            email = self.engTable[self.engTable['NAME']==att]['EMAIL'].iloc[0]
+                            if email not in to_list:
+                                to_list.append(email)
                 else:
-                    email = self.cs.getEmail(row['CQE'])
-                    if email != None and (email not in to_list):
+                    name, email, mgr, mgr_email = self.cs.getFullInfo(row['CQE'])
+                    if email != '' and (email not in to_list):
                         to_list.append(email)
+                    if mgr_email != '' and (mgr_email not in cc_list):
+                        cc_list.append(mgr_email)
+                    if name != '' and email != '' and mgr != '' and mgr_email != '':
+                        try:
+                            self.engTable.loc[len(self.engTable)] = [name, email, 'CQE', mgr, mgr_email, '']
+                            self.engTable.to_csv('tables/EmployeeTable.csv', index_label=False, index=False)
+                        except Exception as err:
+                            print(err)
             mail.To = ';'.join(to_list)
-            mail.CC = ';'.join(cc_list)
-    
+            mail.CC = ';'.join(cc_list)    
             self.df = self.df.astype(str)
             table_cleared = self.df[self.df['Checkout']=='Y']
             table_underway = self.df[(self.df['Status']=='P') & (self.df['Checkout']=='')]
@@ -194,14 +219,12 @@ class emailThread(QThread):
                             })
                     t.set_header_row_style({'background-color': bg[i]})
                     output[i] = t.to_html()
-            mail.HTMLBody = '<p>Dear Team,</p><p>Please refer to the list(s) of the '+str(len(self.df))+' CQC(s) that have been handled at the reception center today. For the un-checkout CQCs, please arrange resources for sample preparation and verification according to the instruction. For the CQCs that need sample cleaning, notification emails will be sent to the responsible engineers when the CQCs are ready to collect.<p>&nbsp;</p>' + (('<p>' + str(len(table_ready)) + ' CQC(s) are waiting to be collected.</p>' + output[0]) if output[0] != None else '<p>No CQC is waiting to be collected.</p>') + (('<p>' + str(len(table_underway)) + ' CQC(s) are under preparation.</p>' + output[1]) if output[1] != None else '<p>No CQC is under preparation.</p>') + (('<p>' + str(len(table_cleared)) + ' CQC(s) have been checked out.</p>' + output[2]) if output[2] != None else '<p>No CQC was checked out.</p>') + (('<p>' + str(len(table_store)) + ' CQC(s) have been stored.</p>' + output[3]) if output[3] != None else '<p>No CQC was stored.</p>') + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
+            mail.HTMLBody = '<p>Dear Team,</p><p>Please refer to the list(s) of the '+str(len(self.df))+' CQC(s) that have been handled at the reception center today. For the un-checkout CQCs, please arrange resources for sample preparation and verification according to the instruction. For the CQCs that need sample cleaning, notification emails will be sent to the responsible engineers when the CQCs are ready to collect.<p>&nbsp;</p>' + (('<p style="color:black">' + str(len(table_ready)) + ' CQC(s) are waiting to be collected.</p>' + output[0]) if output[0] != None else '<p style="color:black">No CQC is waiting to be collected.</p>') + (('<p style="color:black">' + str(len(table_underway)) + ' CQC(s) are under preparation.</p>' + output[1]) if output[1] != None else '<p style="color:black">No CQC is under preparation.</p>') + (('<p style="color:black">' + str(len(table_cleared)) + ' CQC(s) have been checked out.</p>' + output[2]) if output[2] != None else '<p style="color:black">No CQC was checked out.</p>') + (('<p style="color:black">' + str(len(table_store)) + ' CQC(s) have been stored.</p>' + output[3]) if output[3] != None else '<p style="color:black">No CQC was stored.</p>') + '<p>&nbsp;</p><p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
             mail.Save()
             self.result_signal.emit('100')
         except Exception as err:
             print(err)
             self.result_signal.emit('101')
-
-
 
 
 class pandasModel(QAbstractTableModel):

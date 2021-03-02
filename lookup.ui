@@ -334,7 +334,7 @@
      <x>210</x>
      <y>80</y>
      <width>91</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="font">
@@ -358,10 +358,10 @@
   <widget class="QCheckBox" name="tstBox">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>260</x>
      <y>110</y>
-     <width>91</width>
-     <height>20</height>
+     <width>41</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="font">
@@ -376,7 +376,7 @@
     <enum>Qt::NoFocus</enum>
    </property>
    <property name="text">
-    <string>Create TST</string>
+    <string>TST</string>
    </property>
    <property name="checked">
     <bool>true</bool>
@@ -452,7 +452,7 @@ QHeaderView::section{
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>140</y>
+     <y>160</y>
      <width>121</width>
      <height>51</height>
     </rect>
@@ -527,7 +527,7 @@ QHeaderView::section{
    <property name="font">
     <font>
      <family>Calibri</family>
-     <pointsize>9</pointsize>
+     <pointsize>10</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -559,7 +559,7 @@ QHeaderView::section{
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>210</y>
+     <y>220</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -625,6 +625,60 @@ QHeaderView::section{
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
+  <widget class="QCheckBox" name="iceBox">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>130</y>
+     <width>41</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>9</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string>ICE</string>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>110</y>
+     <width>41</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>9</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string>Create</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
   <zorder>insEdit</zorder>
   <zorder>pushButton</zorder>
   <zorder>line</zorder>
@@ -638,7 +692,6 @@ QHeaderView::section{
   <zorder>label_4</zorder>
   <zorder>listenerButton</zorder>
   <zorder>prpBox</zorder>
-  <zorder>tstBox</zorder>
   <zorder>cqcList</zorder>
   <zorder>transferButton</zorder>
   <zorder>resultLabel</zorder>
@@ -646,6 +699,9 @@ QHeaderView::section{
   <zorder>cqcNumEdit</zorder>
   <zorder>clearButton</zorder>
   <zorder>line_2</zorder>
+  <zorder>iceBox</zorder>
+  <zorder>label_5</zorder>
+  <zorder>tstBox</zorder>
  </widget>
  <tabstops>
   <tabstop>cqcNumEdit</tabstop>
