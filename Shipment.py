@@ -88,6 +88,10 @@ class Shipment(QDialog):
                 self.ui.shipperLink.setText('<a href="https://www.ups.com/track?loc=en_CN&tracknum=%s">Track %s on UPS</a>'%(num,num))
             if carrier == 'EMS':
                 self.ui.shipperLink.setText('<a href="http://www.ems.com.cn/mailtracking/e_you_jian_cha_xun.html">Track %s on EMS</a>'%(num))
+            if carrier == 'DHL':
+                self.ui.shipperLink.setText('<a href="https://www.dhl.com/en/express/tracking.html?AWB=%s">Track %s on DHL</a>'%(num,num))
+            if carrier == 'FedEx':
+                self.ui.shipperLink.setText('<a href="https://www.fedex.com/fedextrack/?action=track&trackingnumber=%s">Track %s on FedEx</a>'%(num,num))
 
     def updateCQCList(self):
         self.ui.progressBar.setValue(0)

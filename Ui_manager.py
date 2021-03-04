@@ -45,7 +45,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.pushButton.setFont(font)
-        self.pushButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.pushButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.pushButton.setObjectName("pushButton")
         self.Label_1 = QtWidgets.QLabel(Dialog)
         self.Label_1.setGeometry(QtCore.QRect(20, 80, 241, 31))
