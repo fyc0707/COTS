@@ -29,7 +29,7 @@ class Shipment(QDialog):
         self.cs = cs
         self.ui.welcomeLabel.setText('Welcome, ' + self.cs.user_name)
         self.list_file = 'log/'+datetime.today().date().isoformat()+'/wipList.xlsx'
-        self.ship_file = 'log/'+datetime.today().date().isoformat()+'/shipment.csv'
+        self.ship_file = 'log/shipment.csv'
         self.checkFile()
 
     def checkFile(self):
@@ -62,9 +62,10 @@ class Shipment(QDialog):
                 self.ui.cqcList.setColumnWidth(9,90)
                 self.ui.cqcList.setColumnWidth(10,100)
                 self.ui.cqcList.setColumnWidth(11,100)
-                self.ui.cqcList.setColumnWidth(12,90)
-                self.ui.cqcList.setColumnWidth(13,110)
-                self.ui.cqcList.setColumnWidth(14,100)            
+                self.ui.cqcList.setColumnWidth(12,100)
+                self.ui.cqcList.setColumnWidth(13,90)
+                self.ui.cqcList.setColumnWidth(14,110)
+                self.ui.cqcList.setColumnWidth(15,100)            
             else:
                 self.ui.cqcListLable.setText('No list found')
                 self.df = None
@@ -78,7 +79,8 @@ class Shipment(QDialog):
         carrier = self.df['Carrier'].loc[row]
         num = self.df['Ship Ref.'].loc[row]
         if carrier != '' and num != '':
-            if carrier == 'FedEx CN':
+            carrier = str(carrier).upper()
+            if carrier == 'FEDEX CN':
                 self.ui.shipperLink.setText('<a href="https://cndxp.apac.fedex.com/app/track?method=query&language=en&region=CN&tn=%s">Track %s on FedEx CN</a>'%(num,num))
             if carrier == 'TNT':
                 self.ui.shipperLink.setText('<a href="https://www.tnt.com/express/en_cn/site/shipping-tools/tracking.html?searchType=CON&cons=%s">Track %s on TNT</a>'%(num,num))
@@ -90,7 +92,7 @@ class Shipment(QDialog):
                 self.ui.shipperLink.setText('<a href="http://www.ems.com.cn/mailtracking/e_you_jian_cha_xun.html">Track %s on EMS</a>'%(num))
             if carrier == 'DHL':
                 self.ui.shipperLink.setText('<a href="https://www.dhl.com/en/express/tracking.html?AWB=%s">Track %s on DHL</a>'%(num,num))
-            if carrier == 'FedEx':
+            if carrier == 'FEDEX':
                 self.ui.shipperLink.setText('<a href="https://www.fedex.com/fedextrack/?action=track&trackingnumber=%s">Track %s on FedEx</a>'%(num,num))
 
     def updateCQCList(self):
@@ -314,7 +316,7 @@ class downloadThread(QThread):
             #Others Tracking
 
             self.df = pd.merge(self.df, result_df, how='left', on=['Carrier', 'Ship Ref.'])
-            self.df = self.df[['CQC#','CQE','Customer','Part Name','PE','Qty','Trace Code','Instruction','Carrier', 'Ship Ref.','Origin','Destination','Status','Current Location','Delivery Date']]
+            self.df = self.df[['CQC#','CQE','Customer','Part Name','PE','Qty','Trace Code','Instruction','Carrier', 'Ship Ref.','Origin','Ship Date','Destination','Status','Current Location','Delivery Date']]
             self.df.to_csv(self.ship_file+'1', na_rep='',index=False)
             self.process_signal.emit(102)
         except Exception as err:

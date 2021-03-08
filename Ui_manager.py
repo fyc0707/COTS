@@ -130,7 +130,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.saveRespButton.setFont(font)
-        self.saveRespButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.saveRespButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.saveRespButton.setStyleSheet("QPushButton {\n"
 "    color: #333;\n"
 "    border: 1px solid #555;\n"
@@ -163,7 +163,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.assignPEButton.setFont(font)
-        self.assignPEButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.assignPEButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.assignPEButton.setStyleSheet("QPushButton {\n"
 "    color: #333;\n"
 "    border: 1px solid #555;\n"
@@ -196,7 +196,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.addAttButton.setFont(font)
-        self.addAttButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.addAttButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.addAttButton.setStyleSheet("QPushButton {\n"
 "    color: #333;\n"
 "    border: 1px solid #555;\n"
@@ -229,7 +229,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.partSelButton.setFont(font)
-        self.partSelButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.partSelButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.partSelButton.setStyleSheet("QPushButton {\n"
 "    color: #333;\n"
 "    border: 1px solid #555;\n"
@@ -262,7 +262,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.partAttEdit.setFont(font)
-        self.partAttEdit.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.partAttEdit.setFocusPolicy(QtCore.Qt.NoFocus)
         self.partAttEdit.setPlainText("")
         self.partAttEdit.setObjectName("partAttEdit")
         self.clearOwnerButton = QtWidgets.QPushButton(Dialog)
@@ -273,7 +273,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.clearOwnerButton.setFont(font)
-        self.clearOwnerButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.clearOwnerButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.clearOwnerButton.setStyleSheet("QPushButton {\n"
 "    color: #333;\n"
 "    border: 1px solid #555;\n"
@@ -306,7 +306,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.clearAttButton.setFont(font)
-        self.clearAttButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.clearAttButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.clearAttButton.setStyleSheet("QPushButton {\n"
 "    color: #333;\n"
 "    border: 1px solid #555;\n"
@@ -350,7 +350,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.lookUpButton.setFont(font)
-        self.lookUpButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.lookUpButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.lookUpButton.setStyleSheet("QPushButton {\n"
 "    color: #333;\n"
 "    border: 1px solid #555;\n"
@@ -399,7 +399,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.saveEngButton.setFont(font)
-        self.saveEngButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.saveEngButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.saveEngButton.setStyleSheet("QPushButton {\n"
 "    color: #333;\n"
 "    border: 1px solid #555;\n"
@@ -467,7 +467,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.addEngAttButton.setFont(font)
-        self.addEngAttButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.addEngAttButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.addEngAttButton.setStyleSheet("QPushButton {\n"
 "    color: #333;\n"
 "    border: 1px solid #555;\n"
@@ -500,7 +500,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.engAttEdit.setFont(font)
-        self.engAttEdit.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.engAttEdit.setFocusPolicy(QtCore.Qt.NoFocus)
         self.engAttEdit.setPlainText("")
         self.engAttEdit.setObjectName("engAttEdit")
         self.Label_6 = QtWidgets.QLabel(Dialog)
@@ -522,7 +522,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.clearEngAttButton.setFont(font)
-        self.clearEngAttButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.clearEngAttButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.clearEngAttButton.setStyleSheet("QPushButton {\n"
 "    color: #333;\n"
 "    border: 1px solid #555;\n"
@@ -577,7 +577,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.partCSVButton.setFont(font)
-        self.partCSVButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.partCSVButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.partCSVButton.setStyleSheet("QPushButton {\n"
 "    color: #333;\n"
 "    border: 1px solid #555;\n"
@@ -610,7 +610,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.engCSVButton.setFont(font)
-        self.engCSVButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.engCSVButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.engCSVButton.setStyleSheet("QPushButton {\n"
 "    color: #333;\n"
 "    border: 1px solid #555;\n"
@@ -740,7 +740,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.updateAllButton.setFont(font)
-        self.updateAllButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.updateAllButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.updateAllButton.setStyleSheet("QPushButton {\n"
 "    color: #333;\n"
 "    border: 1px solid #555;\n"
@@ -773,7 +773,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.updateButton.setFont(font)
-        self.updateButton.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.updateButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.updateButton.setStyleSheet("QPushButton {\n"
 "    color: #333;\n"
 "    border: 1px solid #555;\n"
