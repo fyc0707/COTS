@@ -501,7 +501,7 @@ class emailThread(QThread):
                         })
                 t.set_header_row_style({'background-color': '#c9d200'})
                 return t.to_html()
-            mail.HTMLBody = '<p>Dear Team,</p><p>Please refer to the list of the '+str(len(self.df))+' CQC(s) that are on the way to Tianjin CQC reception center, please arrange resources for sample preparation and verification.</p>'+to_html(self.df)+'<p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
+            mail.HTMLBody = '<p>Dear Team,</p><p>Please refer to the list of the '+str(len(self.df))+' CQC(s) that are on the way to Tianjin CQC reception center, please arrange resources for sample preparation and verification. Please input your CQC insturction in the fisrt user defined field of RCV phase in CQC system.</p>'+to_html(self.df)+'<p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
             mail.Save()
             self.result_signal.emit('100')
         except Exception as err:
