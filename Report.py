@@ -137,7 +137,8 @@ class emailThread(QThread):
             mail = obj.CreateItem(0)
             mail.Subject = 'Report of Received CQCs '+date
             to_list = []
-            cc_list = ['helen.zhu@nxp.com','ricky.li@nxp.com','wayne.li@nxp.com','shuyuan.chai@nxp.com','xuejie.zhang@nxp.com','zhang.rui@nxp.com','yan.mu@nxp.com','z.wang@nxp.com','van.fan@nxp.com','zhi.zhao@nxp.com']
+            cc_list = []
+            cc_list.extend(self.engTable[self.engTable['GM_RCV']=='Y']['EMAIL'].to_list())
             for i, row in self.df.iterrows():
                 if row['PE'] in self.engTable['NAME'].values:
                     r = self.engTable[self.engTable['NAME']==row['PE']].iloc[0]
@@ -153,7 +154,7 @@ class emailThread(QThread):
                             email = self.engTable[self.engTable['NAME']==att]['EMAIL'].iloc[0]
                             if email not in to_list:
                                 to_list.append(email)
-                else:
+                elif row['PE']!='':
                     name, email, mgr, mgr_email = self.cs.getFullInfo(row['PE'])
                     if email != '' and (email not in to_list):
                         to_list.append(email)
@@ -161,7 +162,7 @@ class emailThread(QThread):
                         cc_list.append(mgr_email)
                     if name != '' and email != '' and mgr != '' and mgr_email != '':
                         try:
-                            self.engTable.loc[len(self.engTable)] = [name, email, 'PE', mgr, mgr_email, '']
+                            self.engTable.loc[len(self.engTable)] = [name, email, 'PE', mgr, mgr_email, '', '', '']
                             self.engTable.to_csv('tables/EmployeeTable.csv', index_label=False, index=False)
                         except Exception as err:
                             print(err)
@@ -179,7 +180,7 @@ class emailThread(QThread):
                             email = self.engTable[self.engTable['NAME']==att]['EMAIL'].iloc[0]
                             if email not in to_list:
                                 to_list.append(email)
-                else:
+                elif row['CQE']!='':
                     name, email, mgr, mgr_email = self.cs.getFullInfo(row['CQE'])
                     if email != '' and (email not in to_list):
                         to_list.append(email)
@@ -187,7 +188,7 @@ class emailThread(QThread):
                         cc_list.append(mgr_email)
                     if name != '' and email != '' and mgr != '' and mgr_email != '':
                         try:
-                            self.engTable.loc[len(self.engTable)] = [name, email, 'CQE', mgr, mgr_email, '']
+                            self.engTable.loc[len(self.engTable)] = [name, email, 'CQE', mgr, mgr_email, '', '', '']
                             self.engTable.to_csv('tables/EmployeeTable.csv', index_label=False, index=False)
                         except Exception as err:
                             print(err)

@@ -90,7 +90,7 @@
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="text">
     <string>Back to Menu</string>
@@ -294,7 +294,7 @@
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
@@ -343,7 +343,7 @@ QPushButton:pressed {
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
@@ -392,7 +392,7 @@ QPushButton:pressed {
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
@@ -441,7 +441,7 @@ QPushButton:pressed {
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
@@ -514,7 +514,7 @@ QPushButton:pressed {
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
@@ -563,7 +563,7 @@ QPushButton:pressed {
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
@@ -639,7 +639,7 @@ QPushButton:pressed {
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
@@ -731,7 +731,7 @@ QPushButton:pressed {
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
@@ -862,7 +862,7 @@ QPushButton:pressed {
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
@@ -898,7 +898,7 @@ QPushButton:pressed {
     <rect>
      <x>80</x>
      <y>580</y>
-     <width>331</width>
+     <width>301</width>
      <height>81</height>
     </rect>
    </property>
@@ -947,7 +947,7 @@ QPushButton:pressed {
   <widget class="QPushButton" name="clearEngAttButton">
    <property name="geometry">
     <rect>
-     <x>420</x>
+     <x>390</x>
      <y>580</y>
      <width>51</width>
      <height>31</height>
@@ -962,7 +962,7 @@ QPushButton:pressed {
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
@@ -1065,7 +1065,7 @@ QPushButton:pressed {
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
@@ -1115,7 +1115,7 @@ QPushButton:pressed {
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
@@ -1270,7 +1270,7 @@ QPushButton:pressed {
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="editable">
     <bool>false</bool>
@@ -1363,7 +1363,7 @@ QPushButton:pressed {
   <widget class="QPushButton" name="updateAllButton">
    <property name="geometry">
     <rect>
-     <x>320</x>
+     <x>280</x>
      <y>580</y>
      <width>81</width>
      <height>71</height>
@@ -1414,7 +1414,7 @@ QPushButton:pressed {
    <property name="geometry">
     <rect>
      <x>690</x>
-     <y>540</y>
+     <y>630</y>
      <width>81</width>
      <height>31</height>
     </rect>
@@ -1428,7 +1428,7 @@ QPushButton:pressed {
     </font>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton {
@@ -1457,6 +1457,84 @@ QPushButton:pressed {
    </property>
    <property name="text">
     <string>Get Update</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Label_12">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>540</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string>Subscribe</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="rcvBox">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>540</y>
+     <width>191</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string>CQC Handling Report</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="shipBox">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>570</y>
+     <width>171</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Calibri</family>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string>On the Way Report</string>
    </property>
   </widget>
   <zorder>updateAllButton</zorder>
@@ -1502,6 +1580,9 @@ QPushButton:pressed {
   <zorder>mgrNameLabel</zorder>
   <zorder>mgrEmailLabel</zorder>
   <zorder>updateButton</zorder>
+  <zorder>Label_12</zorder>
+  <zorder>rcvBox</zorder>
+  <zorder>shipBox</zorder>
  </widget>
  <resources>
   <include location="manager_resource.qrc"/>

@@ -18,8 +18,7 @@ class Manager(QDialog):
         self.em = QErrorMessage(self)
         self.partFlag = False
         self.checkFile()
-        self.ui.engFuncEdit.addItems(['New role...', 'CQE', 'PE', 'TECHNICIAN'])
-        self.ui.engFuncEdit.setCurrentIndex(-1)
+        
         
     def closeEvent(self, event):
         if self.partFlag:
@@ -45,6 +44,8 @@ class Manager(QDialog):
             self.ui.engineerEdit.addItem('Create a new engineer...')
             self.ui.engineerEdit.addItems(self.engTable['NAME'].sort_values().values.tolist())
             self.ui.engineerEdit.setCurrentIndex(-1)
+            self.ui.engFuncEdit.addItems(['New role...']+list(set(self.engTable['FUNCTION'])))
+            self.ui.engFuncEdit.setCurrentIndex(-1)
         except Exception as err:
             self.em.showMessage('Failed to load the engineer table. Please close the file in use and restart the window.')
             print(err)
@@ -57,6 +58,8 @@ class Manager(QDialog):
         self.ui.mgrNameLabel.setText('')
         self.ui.mgrEmailLabel.setText('')
         self.ui.engAttEdit.setPlainText('')
+        self.ui.rcvBox.setChecked(False)
+        self.ui.shipBox.setChecked(False)
         eng = self.ui.engineerEdit.currentText()
         if eng in self.engTable['NAME'].values:
             row = self.engTable[self.engTable['NAME']==eng].iloc[0]
@@ -68,6 +71,10 @@ class Manager(QDialog):
             att = str(row['ATTENTION_NAME'])
             att = att.replace(';',';\n', att.count(';')-1)
             self.ui.engAttEdit.setPlainText(att)
+            if row['GM_RCV']=='Y':
+                self.ui.rcvBox.setChecked(True)
+            if row['GM_SHIP']=='Y':
+                self.ui.shipBox.setChecked(True)
         else:
             if re.search(r'[A-Za-z]{3}[0-9]{5}',eng):
                 self.thread = fillInfoThread(self.cs, eng)
@@ -158,12 +165,14 @@ class Manager(QDialog):
         eng = self.ui.engInfoLabel.text()
         if eng == '':
             return
+        rcv = 'Y' if self.ui.rcvBox.isChecked() else ''
+        ship = 'Y' if self.ui.shipBox.isChecked() else ''
         if eng in self.engTable['NAME'].values:
             self.engTable.loc[self.engTable['NAME']==eng] = [[self.ui.engInfoLabel.text(), self.ui.engEmailLabel.text(), 
-                                                                self.ui.engFuncEdit.currentText(), self.ui.mgrNameLabel.text(), self.ui.mgrEmailLabel.text(), self.ui.engAttEdit.toPlainText().replace('\n','')]]
+                                                                self.ui.engFuncEdit.currentText(), self.ui.mgrNameLabel.text(), self.ui.mgrEmailLabel.text(), self.ui.engAttEdit.toPlainText().replace('\n',''), rcv, ship]]
         else:
             self.engTable.loc[len(self.engTable)] = [self.ui.engInfoLabel.text(), self.ui.engEmailLabel.text(), 
-                                                    self.ui.engFuncEdit.currentText(), self.ui.mgrNameLabel.text(), self.ui.mgrEmailLabel.text(), self.ui.engAttEdit.toPlainText().replace('\n','')]
+                                                    self.ui.engFuncEdit.currentText(), self.ui.mgrNameLabel.text(), self.ui.mgrEmailLabel.text(), self.ui.engAttEdit.toPlainText().replace('\n',''), rcv, ship]
             self.ui.engineerEdit.addItem(eng)
         try:
             self.engTable.to_csv('tables/EmployeeTable.csv', index_label=False, index=False)

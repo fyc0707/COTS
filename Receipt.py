@@ -10,6 +10,7 @@ from reportlab.pdfgen import canvas
 from reportlab.platypus import Paragraph, Image
 from reportlab.lib.units import cm
 from reportlab.lib.styles import ParagraphStyle as PS
+from reportlab.lib.utils import ImageReader
 
 import CQCSniffer
 import Ui_receipt
@@ -524,9 +525,7 @@ class checkinThread(QThread):
             print('/\\'.join(data))
             qrcode.make(fit=True)
             qrcode = qrcode.make_image(fill_color="black", back_color="white")
-            qrcode.save('log/qr.png',format='png')
-            story.drawImage('log/qr.png', 3.3*cm, 1*cm, width=2.7*cm, height=2.7*cm, preserveAspectRatio=True)
-            os.remove('log/qr.png')
+            story.drawImage(ImageReader(qrcode.get_image()), 3.3*cm, 1*cm, width=2.7*cm, height=2.7*cm, preserveAspectRatio=True)
             story.save()
             args = 'gswin32c -dPrinted -dNOPAUSE -dBATCH -dNOSAFER -q -dNOPROMPT -dNumCopies=1 -dFitPage -sDEVICE=mswinpr2 ' \
                 '-dDEVICEWIDTHPOINTS=170 ' \
