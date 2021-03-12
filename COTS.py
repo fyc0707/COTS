@@ -107,6 +107,8 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     w = Mainwindow()
     w.show()
+    if not os.path.exists('log/'):
+        os.mkdir('log/')
     history = os.listdir('log/')
     lastlog = None
     for h in history:
@@ -132,7 +134,7 @@ if __name__ == '__main__':
                 leftover.to_csv(log+'/log.csv', index_label=False, index=False)
             except Exception as err:
                 print(err)
-                w.em.showMessage('Failed to acquire the log of yesterday. The program will exit. Please close the files in use and retry.')
+                w.em.showMessage('Failed to fetch the log of yesterday. The program will exit. Please close the files in use and retry.')
                 w.close()
         else:
             os.mkdir(log)
