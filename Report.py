@@ -65,7 +65,7 @@ class Report(QDialog):
         if len(self.df)==0:
             self.em.showMessage('The list is empty.')
             return
-        self.thread = emailThread(self.cs, self.df, self.engTable)
+        self.thread = emailThread(self.cs, self.df, self.engTable, self.productTable)
         self.thread.result_signal.connect(self.emailCallBack)
         self.thread.start()
         self.busy()
@@ -123,10 +123,11 @@ class Report(QDialog):
 
 class emailThread(QThread):
     result_signal = pyqtSignal(str)
-    def __init__(self, cs: CQCSniffer.CQCSniffer, df, engTable):
+    def __init__(self, cs: CQCSniffer.CQCSniffer, df, engTable, productTable):
         super(emailThread, self).__init__()
         self.df = df
         self.engTable = engTable
+        self.productTable = productTable
         self.cs = cs
 
     def run(self):
@@ -140,6 +141,14 @@ class emailThread(QThread):
             cc_list = []
             cc_list.extend(self.engTable[self.engTable['GM_RCV']=='Y']['EMAIL'].to_list())
             for i, row in self.df.iterrows():
+                if row['Product'] in self.productTable['PART_TYPE_NAME'].values:
+                    r = self.productTable[self.productTable['PART_TYPE_NAME']==row['Product']].iloc[0]
+                    atts = r['ATTENTION_NAME']
+                    for att in atts.split(';'):
+                        if att != '':
+                            email = self.engTable[self.engTable['NAME']==att]['EMAIL'].iloc[0]
+                            if email not in cc_list:
+                                cc_list.append(email)
                 if row['PE'] in self.engTable['NAME'].values:
                     r = self.engTable[self.engTable['NAME']==row['PE']].iloc[0]
                     email = r['EMAIL']

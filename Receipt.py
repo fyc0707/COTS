@@ -71,7 +71,7 @@ class Receipt(QDialog):
                 self.thread.result_signal.connect(self.fillInfoCallBack)
                 self.thread.start()
                 self.busy()
-        except Exceptiion as err:
+        except Exception as err:
             print(err)
 
     def fillInfoCallBack(self, signal):

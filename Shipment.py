@@ -81,7 +81,7 @@ class Shipment(QDialog):
         if carrier != '' and num != '':
             carrier = str(carrier).upper()
             if carrier == 'FEDEX CN':
-                self.ui.shipperLink.setText('<a href="https://cndxp.apac.fedex.com/app/track?method=query&language=en&region=CN&tn=%s">Track %s on FedEx CN</a>'%(num,num))
+                self.ui.shipperLink.setText('<a href="https://cndxp.apac.fedex.com/app/track?method=query&language=zh&region=CN&tn=%s">Track %s on FedEx CN</a>'%(num,num))
             if carrier == 'TNT':
                 self.ui.shipperLink.setText('<a href="https://www.tnt.com/express/en_cn/site/shipping-tools/tracking.html?searchType=CON&cons=%s">Track %s on TNT</a>'%(num,num))
             if carrier == 'SF':
@@ -134,7 +134,7 @@ class Shipment(QDialog):
         if len(self.df)==0:
             self.em.showMessage('The list is empty.')
             return
-        self.thread = emailThread(self.cs, self.df, self.engTable)
+        self.thread = emailThread(self.cs, self.df, self.engTable, self.productTable)
         self.thread.result_signal.connect(self.emailCallBack)
         self.thread.start()
         self.busy()
@@ -259,7 +259,9 @@ class downloadThread(QThread):
                     if 'FED' in trim:
                         row['Carrier'] = 'FedEx'
                         trim = re.sub(r'[A-Z]','',trim)
-                        if trim.startswith('12'):
+                        if trim == '':
+                            row['Carrier'] = ''
+                        if trim.startswith('1'):
                             row['Carrier'] = 'FedEx CN'
                         row['Ship Ref.'] = trim
                     elif 'DHL' in trim:
@@ -307,14 +309,13 @@ class downloadThread(QThread):
             result_df.loc[self.df['Carrier']=='FedEx',['Origin','Ship Date','Destination','Status','Current Location','Delivery Date']] = result
 
             #DHL Tracking
-            result = []
+            '''result = []
             tracking_numbers = result_df[result_df['Carrier']=='DHL']['Ship Ref.'].to_list()
             for n in tracking_numbers:
                 result.append(self.track_dhl(n))
-            result_df.loc[self.df['Carrier']=='DHL',['Origin','Ship Date','Destination','Status','Current Location','Delivery Date']] = result
+            result_df.loc[self.df['Carrier']=='DHL',['Origin','Ship Date','Destination','Status','Current Location','Delivery Date']] = result'''
             self.process_signal.emit(100)
             #Others Tracking
-
             self.df = pd.merge(self.df, result_df, how='left', on=['Carrier', 'Ship Ref.'])
             self.df = self.df[['CQC#','CQE','Customer','Part Name','PE','Qty','Trace Code','Instruction','Carrier', 'Ship Ref.','Origin','Ship Date','Destination','Status','Current Location','Delivery Date']]
             self.df.to_csv(self.ship_file+'1', na_rep='',index=False)
@@ -333,6 +334,14 @@ class downloadThread(QThread):
         data = requests.post('https://www.fedex.com/trackingCal/track', data={
             'data': json.dumps({
                 'TrackPackagesRequest': {
+                'appType': 'wtrk',
+                'uniqueKey': '',
+                'processingParameters': {
+                    'anonymousTransaction': True,
+                    'clientId': 'WTRK',
+                    'returnDetailedErrors': True,
+                    'returnLocalizedDateTime': False
+                },
                 'trackingInfoList': trackingInfoList
                 }
             }),
@@ -411,10 +420,11 @@ class downloadThread(QThread):
 
 class emailThread(QThread):
     result_signal = pyqtSignal(str)
-    def __init__(self, cs: CQCSniffer.CQCSniffer, df, engTable):
+    def __init__(self, cs: CQCSniffer.CQCSniffer, df, engTable, productTable):
         super(emailThread, self).__init__()
         self.df = df
         self.engTable = engTable
+        self.productTable = productTable
         self.cs = cs
 
     def run(self):
@@ -428,6 +438,14 @@ class emailThread(QThread):
             cc_list = []
             cc_list.extend(self.engTable[self.engTable['GM_SHIP']=='Y']['EMAIL'].to_list())
             for i, row in self.df.iterrows():
+                if row['Part Name'] in self.productTable['PART_TYPE_NAME'].values:
+                    r = self.productTable[self.productTable['PART_TYPE_NAME']==row['Part Name']].iloc[0]
+                    atts = r['ATTENTION_NAME']
+                    for att in atts.split(';'):
+                        if att != '':
+                            email = self.engTable[self.engTable['NAME']==att]['EMAIL'].iloc[0]
+                            if email not in cc_list:
+                                cc_list.append(email)
                 if row['PE'] in self.engTable['NAME'].values:
                     r = self.engTable[self.engTable['NAME']==row['PE']].iloc[0]
                     email = r['EMAIL']
@@ -501,7 +519,7 @@ class emailThread(QThread):
                         })
                 t.set_header_row_style({'background-color': '#c9d200'})
                 return t.to_html()
-            mail.HTMLBody = '<p>Dear Team,</p><p>Please refer to the list of the '+str(len(self.df))+' CQC(s) that are on the way to Tianjin CQC reception center, please arrange resources for sample preparation and verification. Please input your CQC insturction in the fisrt user defined field of RCV phase in CQC system.</p>'+to_html(self.df)+'<p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
+            mail.HTMLBody = '<p>Dear Team,</p><p>Please refer to the list of the '+str(len(self.df))+' CQC(s) that are on the way to Tianjin CQC reception center, please arrange resources for sample preparation and verification. Please input your CQC instruction in the first user defined field of RCV phase in CQC system.</p>'+to_html(self.df)+'<p>&nbsp;</p><p>If you are not the responsible contact for the product, please contact Van Fan for correction.</p><p>&nbsp;</p><p>Best Regards,</p><p>Tianjin Business Line Quality</p><p>CQC Operation Tracking System</p>'
             mail.Save()
             self.result_signal.emit('100')
         except Exception as err:
